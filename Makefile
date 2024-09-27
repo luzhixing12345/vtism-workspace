@@ -14,17 +14,17 @@ INITRAMFS = initramfs.img
 LINUX_VERSION = 6.6
 # LINUX_VERSION = 4.4.6
 
-IMAGE = /home/linux-$(LINUX_VERSION)
+IMAGE = /home/lzx/linux-$(LINUX_VERSION)
 #IMAGE = /home/kamilu/aos/lab/4.4.6-ubuntu1604/ubuntu1604
 
-CXL_ARGS =  -M q35,cxl=on -m 4G,maxmem=8G,slots=8 -smp 4
+# CXL_ARGS =  -M q35,cxl=on -m 4G,maxmem=8G,slots=8 -smp 4
 # CXL_ARGS += -object memory-backend-ram,id=vmem0,share=on,size=256M \
 # -device pxb-cxl,bus_nr=12,bus=pcie.0,id=cxl.1 \
 # -device cxl-rp,port=0,bus=cxl.1,id=root_port13,chassis=0,slot=2 \
 # -device cxl-type3,bus=root_port13,volatile-memdev=vmem0,id=cxl-vmem0 \
 # -M cxl-fmw.0.targets.0=cxl.1,cxl-fmw.0.size=4G
 
-CXL_ARGS += -object memory-backend-file,id=cxl-mem1,share=on,mem-path=/tmp/cxltest.raw,size=256M \
+CXL_ARGS = -object memory-backend-file,id=cxl-mem1,share=on,mem-path=/tmp/cxltest.raw,size=256M \
 -object memory-backend-file,id=cxl-mem2,share=on,mem-path=/tmp/cxltest2.raw,size=256M \
 -object memory-backend-file,id=cxl-mem3,share=on,mem-path=/tmp/cxltest3.raw,size=256M \
 -object memory-backend-file,id=cxl-mem4,share=on,mem-path=/tmp/cxltest4.raw,size=256M \
@@ -141,12 +141,79 @@ cxl:
 	-net nic -net user,hostfwd=tcp::2222-:22 \
 	$(CXL_ARGS)
 
-# cxl:
-# 	$(QEMU) \
-# 	-kernel $(BZIMAGE) \
-# 	-drive format=raw,file=$(DISK) \
-# 	-append "root=/dev/sda2 console=ttyS0" \
-# 	-nographic -no-reboot -d guest_errors \
-# 	-net nic -net user,hostfwd=tcp::2222-:22 \
-# 	$(CXL_ARGS)
+vm_share:
+	taskset -c 48-55 $(QEMU) -name guest=vm0,debug-threads=off \
+    -machine pc \
+    -cpu host \
+    -m 120G \
+    -enable-kvm\
+    -overcommit mem-lock=off \
+    -smp 8 \
+    -object memory-backend-ram,size=120G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -numa node,nodeid=0,memdev=m0 \
+    -uuid 9bc02bdb-58b3-4bb0-b00e-313bdae0ac81 \
+    -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
+    -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
+    -drive file=$(DISK),format=raw,if=none,id=drive-ide0-0-0 \
+    -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
+    -drive if=none,id=drive-ide0-0-1,readonly=on \
+    -device ide-cd,bus=ide.0,unit=1,drive=drive-ide0-0-1,id=ide0-0-1 \
+    -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
+    -netdev user,id=ndev.0,hostfwd=tcp::5555-:22 \
+    -device e1000,netdev=ndev.0 \
+    -nographic \
+	-kernel $(BZIMAGE) \
+    -append "root=/dev/sda2 console=ttyS0 quiet"
 
+TPP_BZIMAGE=/home/lzx/Nomad/src/linux-5.13-rc6/arch/x86/boot/bzImage
+NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
+
+BZIMAGE=$(TPP_BZIMAGE)
+# BZIMAGE=$(NOMAD_BZIMAGE)
+
+
+vm_tmm:
+	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
+    -machine pc \
+    -cpu host \
+    -m 192G \
+    -enable-kvm \
+    -overcommit mem-lock=off \
+    -smp 16 \
+    -object memory-backend-ram,size=32G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=32G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=64G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=64G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -numa node,nodeid=0,memdev=m0,cpus=0-7 \
+    -numa node,nodeid=1,memdev=m1,cpus=8-15 \
+	-numa node,nodeid=2,memdev=m2 \
+    -numa node,nodeid=3,memdev=m3 \
+	-numa dist,src=0,dst=0,val=10 \
+    -numa dist,src=0,dst=1,val=21 \
+    -numa dist,src=0,dst=2,val=24 \
+    -numa dist,src=0,dst=3,val=24 \
+    -numa dist,src=1,dst=0,val=21 \
+    -numa dist,src=1,dst=1,val=10 \
+    -numa dist,src=1,dst=2,val=14 \
+    -numa dist,src=1,dst=3,val=14 \
+    -numa dist,src=2,dst=0,val=24 \
+    -numa dist,src=2,dst=1,val=14 \
+    -numa dist,src=2,dst=2,val=10 \
+    -numa dist,src=2,dst=3,val=16 \
+    -numa dist,src=3,dst=0,val=24 \
+    -numa dist,src=3,dst=1,val=14 \
+    -numa dist,src=3,dst=2,val=16 \
+    -numa dist,src=3,dst=3,val=10 \
+    -uuid 9bc02bdb-58b3-4bb0-b00e-313bdae0ac81 \
+    -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
+    -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
+    -drive file=$(DISK),format=raw,id=drive-ide0-0-0,if=none \
+    -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
+    -drive if=none,id=drive-ide0-0-1,readonly=on \
+    -device ide-cd,bus=ide.0,unit=1,drive=drive-ide0-0-1,id=ide0-0-1 \
+    -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
+    -netdev user,id=ndev.0,hostfwd=tcp::5555-:22 \
+    -device e1000,netdev=ndev.0 \
+    -nographic \
+	-kernel $(BZIMAGE) \
+    -append "root=/dev/sda2 console=ttyS0"
