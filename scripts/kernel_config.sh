@@ -2,9 +2,6 @@
 KERNEL_VERSION=$(uname -r)
 LOG_FILE=${current_dir}/output/${KERNEL_VERSION}-benchmark.log
 
-echo "Kernel version: ${KERNEL_VERSION}"
-echo "Log file: ${LOG_FILE}"
-
 flush_cache() {
 
     # 1: clean page cache
@@ -33,7 +30,7 @@ run() {
     # 执行程序并记录 real time，同时将 stdout 和 stderr 输出到日志文件
     {
         # 使用 time 统计执行时间，只记录 real time
-        real_time=$( (time -p $executable $program_args > /dev/null 2>&1) 2>&1 | awk '/real/ {print $2}')
+        real_time=$((time -p $executable $program_args > /dev/null) 2>&1 | awk '/real/ {print $2}')
         echo "[$exe_name]: $real_time"
     } >> "$LOG_FILE" 2>&1
     flush_cache
@@ -45,5 +42,5 @@ run_backend() {
     shift 1
     program_args="$@"
     echo "Running: $exe_name $program_args in backend"
-    { time -p ${executable} ${program_args} > /dev/null 2>&1 ; } 2> /tmp/backend_time.log &
+    { time -p ${executable} ${program_args} > /dev/null 2>&1; } 2> /tmp/backend_time.log &
 }

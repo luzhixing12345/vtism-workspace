@@ -6,3 +6,5 @@ output
 *.tar.gz
 *.tar.xz
 *.xz
+*.rdb
+benchmark/ycsb-0.17.0/
