@@ -1,0 +1,220 @@
+From c86791bfa9631a69fe54ac1fb9f87383024e089f Mon Sep 17 00:00:00 2001
+From: luzhixing12345 <luzhixing12345@163.com>
+Date: Sun, 29 Sep 2024 04:20:10 -0400
+Subject: [PATCH] fix Makefile compile error
+
+- create configs/make.def basic included Makefile
+- create folder bin/
+- add -lm in CLIB to use math functions like sqrt
+
+Signed-off-by: luzhixing12345 <luzhixing12345@163.com>
+---
+ .gitignore      |   3 +
+ Makefile        |   3 +
+ bin/.gitignore  |   1 +
+ config/make.def | 152 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 159 insertions(+)
+ create mode 100644 .gitignore
+ create mode 100644 bin/.gitignore
+ create mode 100644 config/make.def
+
+diff --git a/.gitignore b/.gitignore
+new file mode 100644
+index 0000000..0a2f776
+--- /dev/null
++++ b/.gitignore
+@@ -0,0 +1,3 @@
++*.o
++npbparams.h
++sys/setparams
+\ No newline at end of file
+diff --git a/Makefile b/Makefile
+index 7c27a72..5e2fe57 100644
+--- a/Makefile
++++ b/Makefile
+@@ -2,6 +2,8 @@ SHELL=/bin/sh
+ CLASS=S
+ SFILE=config/suite.def
+ 
++all: BT SP LU MG FT IS CG EP
++
+ default: header
+ 	@ $(SHELL) sys/print_instructions
+ 
+@@ -51,6 +53,7 @@ clean:
+ 	- rm -f core 
+ 	- rm -f *~ */core */*~ */*.o */npbparams.h */*.obj */*.exe
+ 	- rm -f sys/setparams sys/makesuite sys/setparams.h
++	- rm -rf bin
+ 
+ veryclean: clean
+ 	- rm config/make.def config/suite.def Part*
+diff --git a/bin/.gitignore b/bin/.gitignore
+new file mode 100644
+index 0000000..da7b6e1
+--- /dev/null
++++ b/bin/.gitignore
+@@ -0,0 +1 @@
++*.S
+\ No newline at end of file
+diff --git a/config/make.def b/config/make.def
+new file mode 100644
+index 0000000..e694504
+--- /dev/null
++++ b/config/make.def
+@@ -0,0 +1,152 @@
++#---------------------------------------------------------------------------
++#
++#                SITE- AND/OR PLATFORM-SPECIFIC DEFINITIONS. 
++#
++#---------------------------------------------------------------------------
++
++#---------------------------------------------------------------------------
++# Items in this file will need to be changed for each platform.
++# (Note these definitions are inconsistent with NPB2.1.)
++#---------------------------------------------------------------------------
++
++#---------------------------------------------------------------------------
++# Parallel Fortran:
++#
++# For CG, EP, FT, MG, LU, SP and BT, which are in Fortran, the following must 
++# be defined:
++#
++# F77        - Fortran compiler
++# FFLAGS     - Fortran compilation arguments
++# F_INC      - any -I arguments required for compiling Fortran 
++# FLINK      - Fortran linker
++# FLINKFLAGS - Fortran linker arguments
++# F_LIB      - any -L and -l arguments required for linking Fortran 
++# 
++# compilations are done with $(F77) $(F_INC) $(FFLAGS) or
++#                            $(F77) $(FFLAGS)
++# linking is done with       $(FLINK) $(F_LIB) $(FLINKFLAGS)
++#---------------------------------------------------------------------------
++
++#---------------------------------------------------------------------------
++# This is the fortran compiler used for MPI programs
++#---------------------------------------------------------------------------
++F77 = f77
++# This links MPI fortran programs; usually the same as ${F77}
++FLINK	= f77
++
++#---------------------------------------------------------------------------
++# These macros are passed to the linker 
++#---------------------------------------------------------------------------
++F_LIB  =
++
++#---------------------------------------------------------------------------
++# These macros are passed to the compiler 
++#---------------------------------------------------------------------------
++F_INC =
++
++#---------------------------------------------------------------------------
++# Global *compile time* flags for Fortran programs
++#---------------------------------------------------------------------------
++FFLAGS	= -O3 
++# FFLAGS = -g
++
++#---------------------------------------------------------------------------
++# Global *link time* flags. Flags for increasing maximum executable 
++# size usually go here. 
++#---------------------------------------------------------------------------
++FLINKFLAGS =
++
++
++#---------------------------------------------------------------------------
++# Parallel C:
++#
++# For IS, which is in C, the following must be defined:
++#
++# CC         - C compiler 
++# CFLAGS     - C compilation arguments
++# C_INC      - any -I arguments required for compiling C 
++# CLINK      - C linker
++# CLINKFLAGS - C linker flags
++# C_LIB      - any -L and -l arguments required for linking C 
++#
++# compilations are done with $(CC) $(C_INC) $(CFLAGS) or
++#                            $(CC) $(CFLAGS)
++# linking is done with       $(CLINK) $(C_LIB) $(CLINKFLAGS)
++#---------------------------------------------------------------------------
++
++#---------------------------------------------------------------------------
++# This is the C compiler used for OpenMP programs
++#---------------------------------------------------------------------------
++CC = cc
++# This links C programs; usually the same as ${CC}
++CLINK	= cc
++
++#---------------------------------------------------------------------------
++# These macros are passed to the linker 
++#---------------------------------------------------------------------------
++C_LIB  = -lm
++
++#---------------------------------------------------------------------------
++# These macros are passed to the compiler 
++#---------------------------------------------------------------------------
++C_INC = -I../common
++
++#---------------------------------------------------------------------------
++# Global *compile time* flags for C programs
++#---------------------------------------------------------------------------
++CFLAGS	= -O3
++# CFLAGS = -g
++
++#---------------------------------------------------------------------------
++# Global *link time* flags. Flags for increasing maximum executable 
++# size usually go here. 
++#---------------------------------------------------------------------------
++CLINKFLAGS =
++
++
++#---------------------------------------------------------------------------
++# Utilities C:
++#
++# This is the C compiler used to compile C utilities.  Flags required by 
++# this compiler go here also; typically there are few flags required; hence 
++# there are no separate macros provided for such flags.
++#---------------------------------------------------------------------------
++UCC	= cc -O
++
++
++#---------------------------------------------------------------------------
++# Destination of executables, relative to subdirs of the main directory. . 
++#---------------------------------------------------------------------------
++BINDIR	= ../bin
++
++
++#---------------------------------------------------------------------------
++# The variable RAND controls which random number generator 
++# is used. It is described in detail in Doc/README.install. 
++# Use "randi8" unless there is a reason to use another one. 
++# Other allowed values are "randi8_safe", "randdp" and "randdpvec"
++#---------------------------------------------------------------------------
++# RAND   = randi8
++# The following is highly reliable but may be slow:
++RAND   = randdp
++
++
++#---------------------------------------------------------------------------
++# The variable WTIME is the name of the wtime source code module in the
++# NPB2.x/common directory.  
++# For most machines,       use wtime.c
++# For SGI power challenge: use wtime_sgi64.c
++#---------------------------------------------------------------------------
++WTIME  = wtime.c
++
++
++#---------------------------------------------------------------------------
++# Enable if either Cray or IBM: 
++# (no such flag for most machines: see common/wtime.h)
++# This is used by the C compiler to pass the machine name to common/wtime.h,
++# where the C/Fortran binding interface format is determined
++#---------------------------------------------------------------------------
++# MACHINE	=	-DCRAY
++# MACHINE	=	-DIBM
++
++
+-- 
+2.34.1
+

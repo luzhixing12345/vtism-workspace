@@ -44,7 +44,9 @@ CXL_ARGS = -object memory-backend-file,id=cxl-mem1,share=on,mem-path=/tmp/cxltes
 -device cxl-type3,bus=root_port16,persistent-memdev=cxl-mem4,lsa=cxl-lsa4,id=cxl-pmem3 \
 -M cxl-fmw.0.targets.0=cxl.1,cxl-fmw.0.targets.1=cxl.2,cxl-fmw.0.size=4G,cxl-fmw.0.interleave-granularity=8k
 
-BZIMAGE = $(IMAGE)/arch/x86/boot/bzImage
+X86_KERNEL_PLACE=arch/x86/boot/bzImage
+
+BZIMAGE = $(IMAGE)/$(X86_KERNEL_PLACE)
 #BZIMAGE = bzImage
 MEMORY_SIZE = 1G
 
@@ -63,6 +65,8 @@ endif
 NET_ARG = -net nic,model=e1000 -net user,hostfwd=tcp::2222-:22
 
 VIRTIO_ARGS = -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -object memory-backend-file,id=mem,size=4G,mem-path=/dev/shm,share=on -numa node,memdev=mem -m 4G
+
+default: vm_tmm
 
 init:
 	cd ./initramfs && find . | cpio -ov --format=newc | gzip -9 > ../$(INITRAMFS)
@@ -165,12 +169,14 @@ vm_share:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
 
+BASIC_510_BZIMAGE=/home/lzx/linux-5.10.1/arch/x86/boot/bzImage
 TPP_BZIMAGE=/home/lzx/Nomad/src/linux-5.13-rc6/arch/x86/boot/bzImage
 NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
-
-BZIMAGE=$(TPP_BZIMAGE)
+MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
+# BZIMAGE=$(TPP_BZIMAGE)
+# BZIMAGE=$(BASIC_510_BZIMAGE)
 # BZIMAGE=$(NOMAD_BZIMAGE)
-
+BZIMAGE=$(MEMTIS_BZIMAGE)
 
 vm_tmm:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
@@ -216,4 +222,4 @@ vm_tmm:
     -device e1000,netdev=ndev.0 \
     -nographic \
 	-kernel $(BZIMAGE) \
-    -append "root=/dev/sda2 console=ttyS0"
+    -append "root=/dev/sda2 console=ttyS0 quiet"
