@@ -1,1 +1,0 @@
-patch -p1 < patches/NPB.patch -d benchmark/NPB3.0-omp-C

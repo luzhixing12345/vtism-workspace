@@ -1,3 +1,7 @@
 /disk/tmp/*
 .vscode
 *.png
+output
+*.zip
+*.tar.gz
+*.tar.xz

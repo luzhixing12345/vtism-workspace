@@ -24,8 +24,8 @@
 
 int64_t nverts_known = 0;
 int *degrees;
-int64_t *column;
-float *weights;
+extern int64_t *column;
+extern float *weights;
 extern oned_csr_graph g; //from bfs_reference for isisolated function
 
 //this function is needed for roots generation
