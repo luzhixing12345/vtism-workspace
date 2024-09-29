@@ -93,11 +93,11 @@ def draw(results: Dict[str, Dict[str, str]]):
     graph.plot_2d(data, group_names, column_names)
 
     # 调整x/y轴文字
-    graph.x_label = "The number of data"
-    graph.y_label = "Throughput (Mbps)"
+    graph.x_label = "Benchmarks"
+    graph.y_label = "Normalized time"
 
     # 保存图片
-    graph.save()
+    graph.save(os.path.join(OUTPUT_DIR, "benchmark.png"))
     
 
 if __name__ == "__main__":

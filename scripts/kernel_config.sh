@@ -10,8 +10,8 @@ flush_cache() {
     # 1: clean page cache
     # 2: clean directory entry cache
     # 3: clean page cache, directory entry cache and inode cache
-    echo 3 | sudo tee /proc/sys/vm/drop_caches
-    echo "flushed cache"
+    echo 3 | sudo tee /proc/sys/vm/drop_caches > /dev/null
+    echo -e "\n---- flushed cache ----\n"
 }
 
 
@@ -20,4 +20,30 @@ log_init() {
     # if output directory does not exist, create it
     mkdir -p ${current_dir}/output/
     rm -f ${LOG_FILE}
+}
+
+run() {
+    # 参数1: 可执行文件路径
+    executable=$1
+    exe_name=$(basename $executable)
+    shift 1
+    # 获取中间的参数
+    program_args="$@"
+    echo "Running: $exe_name $program_args"
+    # 执行程序并记录 real time，同时将 stdout 和 stderr 输出到日志文件
+    {
+        # 使用 time 统计执行时间，只记录 real time
+        real_time=$( (time -p $executable $program_args > /dev/null 2>&1) 2>&1 | awk '/real/ {print $2}')
+        echo "[$exe_name]: $real_time"
+    } >> "$LOG_FILE" 2>&1
+    flush_cache
+}
+
+run_backend() {
+    executable=$1
+    exe_name=$(basename $executable)
+    shift 1
+    program_args="$@"
+    echo "Running: $exe_name $program_args in backend"
+    { time -p ${executable} ${program_args} > /dev/null 2>&1 ; } 2> /tmp/backend_time.log &
 }
