@@ -53,7 +53,7 @@ clean:
 	- rm -f core 
 	- rm -f *~ */core */*~ */*.o */npbparams.h */*.obj */*.exe
 	- rm -f sys/setparams sys/makesuite sys/setparams.h
-	- rm -rf bin
+	- rm -rf bin/*.B bin/*.A bin/*.S
 
 veryclean: clean
 	- rm config/make.def config/suite.def Part*

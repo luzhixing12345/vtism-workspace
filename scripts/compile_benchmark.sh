@@ -18,4 +18,6 @@ cd ${current_dir}
 
 echo "compiling NPB3.0-omp-C..."
 cd ${current_dir}/benchmark/NPB3.0-omp-C
-make
+make CLASS=B bt
+
+cd ${current_dir}

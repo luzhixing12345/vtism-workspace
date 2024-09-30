@@ -89,8 +89,8 @@ c-------------------------------------------------------------------*/
 
   printf("\n\n NAS Parallel Benchmarks 3.0 structured OpenMP C version"
 	 " - BT Benchmark\n\n");
-
-  fp = fopen("inputbt.data", "r");
+  char *input_file = argv[1];
+  fp = fopen(input_file, "r");
   if (fp != NULL) {
     printf(" Reading from input file inputbt.data");
     fscanf(fp, "%d", &niter);

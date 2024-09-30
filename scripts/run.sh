@@ -21,22 +21,25 @@ graph500_args="20 16"
 # run ${graph500_exe} ${graph500_args}
 
 # NPB3.0-omp-C
+bt_exe=${current_dir}/benchmark/NPB3.0-omp-C/bin/bt.B
+bt_args="${current_dir}/benchmark/NPB3.0-omp-C/BT/input.data"
+run ${bt_exe} ${bt_args}
 
-check_redis_loading() {
-    redis_path="${current_dir}/benchmark/redis-7.4.0"
-    redis_cli="${redis_path}/src/redis-cli"
+# check_redis_loading() {
+#     redis_path="${current_dir}/benchmark/redis-7.4.0"
+#     redis_cli="${redis_path}/src/redis-cli"
     
-    # wait until loading is done
-    while true; do
-        loading_status=$(${redis_cli} info persistence | grep "loading:1" | wc -l)
-        echo "Redis loading status: ${loading_status}"
-        if [ ${loading_status} -eq 0 ]; then
-            break
-        else
-            sleep 2
-        fi
-    done
-}
+#     # wait until loading is done
+#     while true; do
+#         loading_status=$(${redis_cli} info persistence | grep "loading:1" | wc -l)
+#         echo "Redis loading status: ${loading_status}"
+#         if [ ${loading_status} -eq 0 ]; then
+#             break
+#         else
+#             sleep 2
+#         fi
+#     done
+# }
 
 
 run_redis() {
@@ -48,9 +51,6 @@ run_redis() {
     ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
     workload_path=${redis_path}/workloada.small
     ycsb_args="load redis -s -P $workload_path -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000"
-
-    rm -f *.rdb
-    sleep 5
 
     # run redis server in backend
     echo "start redis server in backend"
@@ -69,7 +69,7 @@ run_redis() {
 
 # redis
 # flush_cache
-run_redis
+# run_redis
 
 # liblinear-multicore
 
