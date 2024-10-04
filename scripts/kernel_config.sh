@@ -44,3 +44,41 @@ run_backend() {
     echo "Running: $exe_name $program_args in backend"
     { time -p ${executable} ${program_args} > /dev/null 2>&1; } 2> /tmp/backend_time.log &
 }
+
+change_numa_balance() {
+    # 0: disable
+    # 1: balance
+    value=$1
+    echo $value | sudo tee /proc/sys/kernel/numa_balancing > /dev/null
+    if [ $value -eq 0 ]; then
+        echo "---- disable numa balance ----"
+    else
+        echo "---- enable numa balance ----"
+    fi
+}
+
+change_hugepage() {
+    # always
+    # madvise
+    # never
+    value=$1
+    echo $value | sudo tee /sys/kernel/mm/transparent_hugepage/enabled > /dev/null
+    if [ $value == "never" ]; then
+        echo "---- disable transparent_hugepage ----"
+    else
+        echo "---- enable transparent_hugepage ----"
+    fi
+}
+
+change_hugepage_defrag() {
+    # always
+    # madvise
+    # never
+    value=$1
+    echo $value | sudo tee /sys/kernel/mm/transparent_hugepage/defrag > /dev/null
+    if [ $value == "never" ]; then
+        echo "---- disable transparent_hugepage defrag ----"
+    else
+        echo "---- enable transparent_hugepage defrag ----"
+    fi
+}

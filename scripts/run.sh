@@ -103,8 +103,15 @@ run_liblinear() {
 }
 # run_liblinear
 
-
-
+# hpcg
+run_hpcg() {
+    hpcg_path=${current_dir}/benchmark/hpcg
+    hpcg_exe="./xhpcg"
+    cd ${hpcg_path}
+    run ${hpcg_exe}
+    cd ${current_dir}
+}
+# run_hpcg
 
 
 echo "Done"

@@ -27,3 +27,5 @@ fi
 # deb-src https://mirrors.ustc.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
 
 # sudo apt install python2
+
+sudo echo ""
