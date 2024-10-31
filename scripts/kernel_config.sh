@@ -82,3 +82,4 @@ change_hugepage_defrag() {
         echo "---- enable transparent_hugepage defrag ----"
     fi
 }
+

@@ -3,27 +3,69 @@
 current_dir=`pwd`
 source ${current_dir}/scripts/kernel_config.sh
 source ${current_dir}/scripts/check_env.sh
+source ${current_dir}/scripts/setup_system.sh
 log_init
 
-
+echo "---- basic info ----"
 echo "Kernel version: ${KERNEL_VERSION}"
 echo "Log file: ${LOG_FILE}"
+system_init
 
+declare -A benchmarks=(
+    ["gapbs"]=false
+    ["graph500"]=false
+    ["NPB3.0-omp-C"]=false
+    ["redis"]=true
+    ["liblinear"]=true
+    ["hpcg"]=true
+)
+
+echo ""
+# 计算benchmark名字的最大长度，用于对齐
+max_length=0
+for benchmark in "${!benchmarks[@]}"; do
+    if [ ${#benchmark} -gt $max_length ]; then
+        max_length=${#benchmark}
+    fi
+done
+
+# 输出所有benchmark的状态，使用右对齐格式
+echo "--- benchmark status ---"
+echo "Benchmark Execution Plan:"
+for benchmark in "${!benchmarks[@]}"; do
+    if [ "${benchmarks[$benchmark]}" == "true" ]; then
+        # green
+        printf "  %-${max_length}s : \033[1;32mYes\033[1;0m\n" "$benchmark"
+    else
+        printf "  %-${max_length}s : \033[1;31mNo\033[1;0m\n" "$benchmark"
+    fi
+done
+# exit
+
+# ask sudo permission
+sudo echo ""
+flush_cache
 
 # gapbs
 pr_exe=${current_dir}/benchmark/gapbs/pr
 pr_args="-u26 -k20 -i10 -n100"
-# run ${pr_exe} ${pr_args}
+if [ "${benchmarks[gapbs]}" == "true" ]; then
+    run ${pr_exe} ${pr_args}
+fi
 
 # graph500
 graph500_exe=${current_dir}/benchmark/graph500/src/graph500_reference_bfs
 graph500_args="20 16"
-# run ${graph500_exe} ${graph500_args}
+if [ "${benchmarks[graph500]}" == "true" ]; then
+    run ${graph500_exe} ${graph500_args}
+fi
 
 # NPB3.0-omp-C
 bt_exe=${current_dir}/benchmark/NPB3.0-omp-C/bin/bt.B
 bt_args="${current_dir}/benchmark/NPB3.0-omp-C/BT/input.data"
-run ${bt_exe} ${bt_args}
+if [ "${benchmarks[NPB3.0-omp-C]}" == "true" ]; then
+    run ${bt_exe} ${bt_args}
+fi
 
 # check_redis_loading() {
 #     redis_path="${current_dir}/benchmark/redis-7.4.0"
@@ -49,7 +91,7 @@ run_redis() {
     redis_server_args=${redis_path}/redis.conf
 
     ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
-    workload_path=${redis_path}/workloada.small
+    workload_path=${redis_path}/workloada.large
     ycsb_args="load redis -s -P $workload_path -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000"
 
     # run redis server in backend
@@ -67,9 +109,10 @@ run_redis() {
     
 }
 
-# redis
-# flush_cache
-# run_redis
+if [ "${benchmarks[redis]}" == "true" ]; then
+    flush_cache
+    run_redis
+fi
 
 # liblinear-multicore
 
@@ -101,7 +144,10 @@ run_liblinear() {
     rm -f /tmp/backend_time.log
     flush_cache
 }
-# run_liblinear
+
+if [ "${benchmarks[liblinear]}" == "true" ]; then
+    run_liblinear
+fi
 
 # hpcg
 run_hpcg() {
@@ -111,7 +157,9 @@ run_hpcg() {
     run ${hpcg_exe}
     cd ${current_dir}
 }
-# run_hpcg
 
+if [ "${benchmarks[hpcg]}" == "true" ]; then
+    run_hpcg
+fi
 
 echo "Done"

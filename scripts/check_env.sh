@@ -28,4 +28,3 @@ fi
 
 # sudo apt install python2
 
-sudo echo ""

@@ -8,3 +8,4 @@ output
 *.xz
 *.rdb
 benchmark/ycsb-0.17.0/
+*.model

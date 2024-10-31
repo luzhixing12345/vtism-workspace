@@ -5,7 +5,9 @@ QEMU_EXE = qemu-system-x86_64
 
 QEMU_PATH = /home/lzx/qemu/build
 QEMU = $(QEMU_PATH)/$(QEMU_EXE)
+QEMU = qemu-system-x86_64
 
+KVM = -enable-kvm -cpu host
 
 QEMU_STR_ARG = earlyprintk=serial,ttyS0 console=ttyS0 noapic norandmaps
 
@@ -124,13 +126,27 @@ vfs:
 clean:
 	rm initramfs.img
 
+VTISM_BZIMAGE=/home/lzx/vtism/arch/x86/boot/bzImage
+TPP_BZIMAGE=/home/lzx/Nomad/src/linux-5.13-rc6/arch/x86/boot/bzImage
+NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
+MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
+# BZIMAGE=$(TPP_BZIMAGE)
+# BZIMAGE=$(BASIC_510_BZIMAGE)
+# BZIMAGE=$(NOMAD_BZIMAGE)
+BZIMAGE=$(MEMTIS_BZIMAGE)
+BZIMAGE=$(VTISM_BZIMAGE)
+
 vtism:
-	$(QEMU) \
+	taskset -c 48-55 $(QEMU) \
 	-kernel $(BZIMAGE) \
 	-drive format=raw,file=$(DISK) \
 	-append "root=/dev/sda2 console=ttyS0 quiet" \
 	-nographic -no-reboot -d guest_errors \
-	-net nic -net user,hostfwd=tcp::2222-:22 -S -s
+	-net nic -net user,hostfwd=tcp::2222-:22 \
+	-cpu host \
+	-enable-kvm \
+	-m 32G -smp 8 -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 -S -s
+	
 
 vm_share:
 	taskset -c 48-55 $(QEMU) -name guest=vm0,debug-threads=off \
@@ -155,16 +171,6 @@ vm_share:
     -nographic \
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
-
-VTISM_BZIMAGE=/home/lzx/linux-6.6/arch/x86/boot/bzImage
-TPP_BZIMAGE=/home/lzx/Nomad/src/linux-5.13-rc6/arch/x86/boot/bzImage
-NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
-MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
-# BZIMAGE=$(TPP_BZIMAGE)
-# BZIMAGE=$(BASIC_510_BZIMAGE)
-# BZIMAGE=$(NOMAD_BZIMAGE)
-BZIMAGE=$(MEMTIS_BZIMAGE)
-BZIMAGE=$(VTISM_BZIMAGE)
 
 vm_tmm:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
@@ -210,21 +216,19 @@ vm_tmm:
     -device e1000,netdev=ndev.0 \
     -nographic \
 	-kernel $(BZIMAGE) \
-    -append "root=/dev/sda2 console=ttyS0"
+    -append "root=/dev/sda2 console=ttyS0 quiet"
 
 
 debug:
 	taskset -c 0-15 $(QEMU) -name guest=vm0 \
     -machine pc \
-    -cpu host \
-    -m 192G \
-    -enable-kvm \
+    -m 64G \
     -overcommit mem-lock=off \
     -smp 16 \
-    -object memory-backend-ram,size=32G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
-    -object memory-backend-ram,size=32G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
-	-object memory-backend-ram,size=64G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
-    -object memory-backend-ram,size=64G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -object memory-backend-ram,size=16G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=16G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=16G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=16G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
     -numa node,nodeid=0,memdev=m0,cpus=0-7 \
     -numa node,nodeid=1,memdev=m1,cpus=8-15 \
 	-numa node,nodeid=2,memdev=m2 \
@@ -257,4 +261,4 @@ debug:
     -device e1000,netdev=ndev.0 \
     -nographic \
 	-kernel $(BZIMAGE) \
-    -append "root=/dev/sda2 console=ttyS0" -S -s
+    -append "root=/dev/sda2 console=ttyS0 quiet nokaslr" -S -s
