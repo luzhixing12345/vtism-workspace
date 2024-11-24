@@ -39,6 +39,7 @@ fi
 
 ls /boot/ | grep ${kernel_version} | sudo xargs -I {} rm /boot/{}
 sudo rm -rf /lib/modules/${kernel_version}
+sudo rm -rf /usr/src/linux-headers-${kernel_version}
 sudo update-grub
 
 echo -e "\e[32mKernel $kernel_version removed successfully.\e[0m"

@@ -50,4 +50,4 @@ KID="${KID//\'/}"
 sed -i "s/GRUB_DEFAULT=.*/GRUB_DEFAULT=\"$MID>$KID\"/" /etc/default/grub
 update-grub
 
-echo -e "\e[31mPlease reboot machine\e[0m"
+echo -e "\e[32mPlease reboot machine\e[0m"

@@ -85,7 +85,6 @@ fi
 
 
 run_redis() {
-    tag=$1
     redis_path=${current_dir}/benchmark/redis-7.4.0
     redis_server_exe=${redis_path}/src/redis-server
     redis_server_args=${redis_path}/redis.conf
@@ -106,7 +105,6 @@ run_redis() {
     run ${ycsb_exe} ${ycsb_args}
     
     kill -9 `pgrep redis`
-    
 }
 
 if [ "${benchmarks[redis]}" == "true" ]; then
