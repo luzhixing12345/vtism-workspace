@@ -29,7 +29,7 @@ def main():
     )
 
     # pid = int(sys.argv[1])
-    pid = 498536
+    pid = subprocess.check_output("pidof qemu-system-x86_64", shell=True, text=True).strip()
     
     # 执行命令
     host_cmd = f"cat /proc/{pid}/status" + " | grep RssAnon | awk '{print $2}'"

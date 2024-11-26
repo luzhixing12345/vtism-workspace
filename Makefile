@@ -175,6 +175,29 @@ vm_share:
 SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=1G \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 vm_tmm:
+	taskset -c 0-7 $(QEMU) -name guest=vm0,debug-threads=off \
+    -machine pc \
+    -cpu host \
+    -m 32G \
+    -enable-kvm \
+    -overcommit mem-lock=off \
+    -smp 8 \
+    -uuid 9bc02bdb-58b3-4bb0-b00e-313bdae0ac81 \
+    -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
+    -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
+    -drive file=$(DISK),format=raw,id=drive-ide0-0-0,if=none \
+    -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
+    -drive if=none,id=drive-ide0-0-1,readonly=on \
+    -device ide-cd,bus=ide.0,unit=1,drive=drive-ide0-0-1,id=ide0-0-1 \
+    -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
+    -netdev user,id=ndev.0,hostfwd=tcp::5555-:22 \
+    -device e1000,netdev=ndev.0 \
+    -nographic \
+	-kernel $(BZIMAGE) \
+    -append "root=/dev/sda2 console=ttyS0 quiet" \
+	$(SHARED_MEM)
+
+vm_tmm_numa:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
@@ -220,7 +243,6 @@ vm_tmm:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet" \
 	$(SHARED_MEM)
-
 
 debug:
 	taskset -c 0-15 $(QEMU) -name guest=vm0 \

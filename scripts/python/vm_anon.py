@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 with open("data.json", "r") as f:
     data = json.load(f)
 
-host_anon_pages_list = data["host_anon_pages_list"][:-500]
-guest_anon_pages_list = data["guest_anon_pages_list"][:-500]
+host_anon_pages_list = data["host_anon_pages_list"]
+guest_anon_pages_list = data["guest_anon_pages_list"]
 
 for i in range(len(host_anon_pages_list)):
     host_anon_pages_list[i] = host_anon_pages_list[i] / 1024 / 1024

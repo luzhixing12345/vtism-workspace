@@ -8,10 +8,8 @@ if [ "$(python -c 'import sys; print(sys.version_info[0])')" -ne "2" ]; then
 fi
 
 # if exsist *.rdb file, remove it
-if [ -f *.rdb ]; then
-    rm *.rdb
-    echo "Remove redis persistence data file *.rdb"
-fi
+rm *.rdb
+echo "Remove redis persistence data file *.rdb"
 
 # sudo vim /etc/apt/sources.list
 #
