@@ -9,3 +9,4 @@ output
 *.rdb
 benchmark/ycsb-0.17.0/
 *.model
+*.json

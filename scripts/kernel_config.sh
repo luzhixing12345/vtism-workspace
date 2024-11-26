@@ -2,6 +2,11 @@
 KERNEL_VERSION=$(uname -r)
 LOG_FILE=${current_dir}/output/${KERNEL_VERSION}-benchmark.log
 
+# if LOG_FILE DIRECTORY does not exist, create it
+if [ ! -d ${current_dir}/output ]; then
+    mkdir -p ${current_dir}/output
+fi
+
 flush_cache() {
 
     # 1: clean page cache

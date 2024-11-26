@@ -178,14 +178,14 @@ vm_tmm:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 192G \
+    -m 64G \
     -enable-kvm \
     -overcommit mem-lock=off \
     -smp 16 \
-    -object memory-backend-ram,size=32G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
-    -object memory-backend-ram,size=32G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
-	-object memory-backend-ram,size=64G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
-    -object memory-backend-ram,size=64G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -object memory-backend-ram,size=16G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=16G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=16G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=16G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
     -numa node,nodeid=0,memdev=m0,cpus=0-7 \
     -numa node,nodeid=1,memdev=m1,cpus=8-15 \
 	-numa node,nodeid=2,memdev=m2 \
