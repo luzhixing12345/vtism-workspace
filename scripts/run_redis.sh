@@ -9,7 +9,7 @@ run_redis() {
     redis_server_args=${redis_path}/redis.conf
 
     ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
-    workload_path=${redis_path}/workloada.large
+    workload_path=${redis_path}/workloada.huge
     ycsb_args="load redis -s -P $workload_path -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000"
 
     # run redis server in backend
