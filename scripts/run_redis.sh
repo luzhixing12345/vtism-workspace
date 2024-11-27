@@ -19,7 +19,7 @@ run_redis() {
     # should wait until loading is done
     # or cause error: LOADING Redis is loading the dataset in memory
     # check_redis_loading
-    sleep 10
+    sleep 5
 
     run ${ycsb_exe} ${ycsb_args}
     
