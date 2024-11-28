@@ -248,12 +248,9 @@ debug:
 	taskset -c 0-7 $(QEMU) -name guest=vm0 \
     -machine pc \
     -m 16G \
-    -overcommit mem-lock=off \
     -smp 8 \
     -uuid 9bc02bdb-58b3-4bb0-b00e-313bdae0ac81 \
-    -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
-    -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
-    -drive file=$(DISK),format=raw,if=none \
+    -drive file=$(DISK),format=raw \
     -netdev user,id=ndev.0,hostfwd=tcp::5555-:22 \
     -device e1000,netdev=ndev.0 \
     -nographic \
