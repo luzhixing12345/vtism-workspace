@@ -32,18 +32,19 @@ x = list(range(len(host_anon_pages_list)))
 
 # 绘制图形
 plt.figure(figsize=(10, 6))
-
+# https://blog.csdn.net/CD_Don/article/details/88070453
 # 绘制宿主机数据
-plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#e94234", linewidth=4)
-plt.plot(x, host_file_pages_list, label="Host VM File", color="#80b1d3", linewidth=4)
+plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="red", linewidth=4)
+plt.plot(x, host_file_pages_list, label="Host VM File", color="mediumturquoise", linewidth=4)
 
 # 4184f3
 
 # 绘制虚拟机数据
-plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="#fe6c01", linewidth=4)
+plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="orange", linewidth=4)
 
 # 绘制虚拟机数据
-plt.plot(x, guest_file_pages_list, label="Guest File", color="#4184f3", linewidth=4)
+# 浅蓝色
+plt.plot(x, guest_file_pages_list, label="Guest File", color="blue", linewidth=4)
 
 # 添加标题和标签
 # plt.title("Host vs Guest AnonPages Over Time")
@@ -62,8 +63,9 @@ plt.yticks(fontsize=18)
 plt.grid(True, linestyle="-", alpha=0.7)
 plt.tight_layout()
 # 保存图像到文件 (可选)
-plt.savefig("anon_pages_comparison.png", dpi=300, pad_inches=0.0, bbox_inches="tight")
-plt.savefig("anon_pages_comparison.pdf", dpi=300, pad_inches=0.0, bbox_inches="tight")
+# plt.savefig("anon_pages_comparison.png", dpi=300, pad_inches=0.0, bbox_inches="tight")
+plt.savefig("anon_pages_comparison.pdf", dpi=300)
+# plt.savefig("anon_pages_comparison.pdf", dpi=300, pad_inches=0.0, bbox_inches="tight")
 
 # 显示图形
 # plt.show()
