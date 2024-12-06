@@ -38,6 +38,8 @@ run() {
         real_time=$((time -p $executable $program_args > /dev/null) 2>&1 | awk '/real/ {print $2}')
         echo "[$exe_name]: $real_time"
     } >> "$LOG_FILE" 2>&1
+
+    echo "[$exe_name]: $real_time"
     flush_cache
 }
 
