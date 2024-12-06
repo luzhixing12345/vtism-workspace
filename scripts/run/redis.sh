@@ -8,6 +8,8 @@ if [ -z "$size" ]; then
     size="large"
 fi
 
+echo "--- run redis ${size} ---"
+
 run_redis() {
     redis_path=${current_dir}/benchmark/redis-7.4.0
     redis_server_exe=${redis_path}/src/redis-server

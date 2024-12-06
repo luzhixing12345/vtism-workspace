@@ -11,23 +11,32 @@ def get_data(file_path):
     matches = re.findall(pattern, content)
     
     # 将匹配到的 A 和 T 分别提取出来
-    A_values = [int(match[0])/1000 for match in matches]
-    T_values = [int(match[1])/1000 for match in matches]
+    A_values = [int(match[0])  for match in matches]
+    T_values = [int(match[1]) for match in matches]
     # print(len(A_values))
     
     return A_values, T_values
 
 def main():
 
-    A_values, T_values = get_data("vma.txt")
+    A_values, T_values = get_data("vma.log")
+    average_A = sum(A_values) / len(A_values)
+    average_T = sum(T_values) / len(T_values)
     
     # 将匹配到的 A 和 T 分别提取出来
-    opt_A_values, opt_T_values = get_data("vma_clean_opt.txt")
+    opt_A_values, opt_T_values = get_data("vma_opt.log")
+    opt_average_A = sum(opt_A_values) / len(opt_A_values)
+    opt_average_T = sum(opt_T_values) / len(opt_T_values)
+    
+    print("average A: ", average_A)
+    print("average T: ", average_T)
+    print("average opt A: ", opt_average_A)
+    print("average opt T: ", opt_average_T)
     
     # 绘制曲线
-    plt.plot(opt_A_values, label='Acessed PTEs', color='blue')
+    plt.plot(A_values, label='Acessed PTEs', color='green')
     plt.plot(T_values, label='Total Page Walks', color='red')
-    
+    plt.plot(opt_A_values, label='Acessed PTEs', color='blue')
     plt.plot(opt_T_values, label='Optimized Page Walks)', color='orange')
     
     # 添加标题和标签

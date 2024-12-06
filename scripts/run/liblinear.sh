@@ -1,8 +1,9 @@
 #!/bin/bash
 
 current_dir=`pwd`
-source ${current_dir}/scripts/check_env.sh
 source ${current_dir}/scripts/kernel_config.sh
+
+echo "--- run liblinear ---"
 
 run_liblinear() {
     liblinear_path=${current_dir}/benchmark/liblinear-multicore-2.47
