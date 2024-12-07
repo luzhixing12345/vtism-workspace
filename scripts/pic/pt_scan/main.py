@@ -19,12 +19,16 @@ def get_data(file_path):
 
 def main():
 
-    A_values, T_values = get_data("vma.log")
+    name = "xsbench"
+    basic_name = name + ".log"
+    opt_name = name + "_opt.log"
+
+    A_values, T_values = get_data(basic_name)
     average_A = sum(A_values) / len(A_values)
     average_T = sum(T_values) / len(T_values)
     
     # 将匹配到的 A 和 T 分别提取出来
-    opt_A_values, opt_T_values = get_data("vma_opt.log")
+    opt_A_values, opt_T_values = get_data(opt_name)
     opt_average_A = sum(opt_A_values) / len(opt_A_values)
     opt_average_T = sum(opt_T_values) / len(opt_T_values)
     
@@ -36,8 +40,8 @@ def main():
     # 绘制曲线
     plt.plot(A_values, label='Acessed PTEs', color='green')
     plt.plot(T_values, label='Total Page Walks', color='red')
-    plt.plot(opt_A_values, label='Acessed PTEs', color='blue')
-    plt.plot(opt_T_values, label='Optimized Page Walks)', color='orange')
+    plt.plot(opt_A_values, label='Opt Acessed PTEs', color='blue')
+    plt.plot(opt_T_values, label='Opt Page Walks)', color='orange')
     
     # 添加标题和标签
     # plt.title('Optimized Page Table Scan')
