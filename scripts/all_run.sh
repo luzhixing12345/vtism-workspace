@@ -31,6 +31,9 @@ elif [ $benchmark == "pr" ]; then
 elif [ $benchmark == "xsbench" ]; then
     echo "run xsbench benchmark"
     ./scripts/run/xsbench.sh
+elif [ $benchmark == "memcached" ]; then
+    echo "run memcached benchmark"
+    ./scripts/run/memcached.sh
 else
     echo "unknown benchmark"
 fi

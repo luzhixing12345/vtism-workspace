@@ -1,6 +1,7 @@
 
 import re
 import matplotlib.pyplot as plt
+import numpy as np
 
 def get_data(file_path):
     with open(file_path, "r") as f:
@@ -18,9 +19,9 @@ def get_data(file_path):
     
     return A_values, T_values, time_values
 
-def main():
+def check_benchmark(name):
 
-    name = "liblinear"
+    # name = "memcached"
     basic_name = name + ".log"
     opt_name = name + "_opt.log"
 
@@ -41,31 +42,82 @@ def main():
     # print("Opt Acessed PTEs:", opt_average_A)
     # print("Opt Page Walks:", opt_average_T)
     # print("Opt Time:", opt_average_time)
-    
+    print(f"{name}")
     print(f"A/T: {average_A:.2f}/{average_T:.2f} ({average_A / average_T * 100:.2f}%)")
     print(f"opt A/T: {opt_average_A:.2f}/{opt_average_T:.2f} ({opt_average_A / opt_average_T * 100:.2f}%)")
     
     print(f'upgrade T: {(average_T - opt_average_T) / average_T * 100:.2f}%')
-    print(f'upgrade time : {(average_time - opt_average_time) / average_time * 100:.2f}%')
+    print(f'upgrade time : {opt_average_time:.2f}/{average_time:.2f} ({(average_time - opt_average_time) / average_time * 100:.2f})%')
     
-    # 绘制曲线
-    plt.plot(A_values, label='Acessed PTEs', color='green')
-    plt.plot(T_values, label='Total Page Walks', color='red')
-    plt.plot(opt_A_values, label='Opt Acessed PTEs', color='blue')
-    plt.plot(opt_T_values, label='Opt Page Walks)', color='orange')
-    
-    # 添加标题和标签
-    # plt.title('Optimized Page Table Scan')
-    plt.xlabel('Time (minute)')
-    plt.ylabel('Count(k)')
-    
-    # 显示图例
-    plt.legend()
-    plt.savefig(f'pt_scan_{name}.pdf', dpi=300)
-    # plt.savefig('pt_scan.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
-    
+    ptes_speedup = (average_T - opt_average_T) / average_T * 100
+    time_speedup = (average_time - opt_average_time) / average_time * 100
+    print('----------')
+    return ptes_speedup, time_speedup
     # 显示图形
     # plt.show()
+
+def plot_speedups(benchmarks, ptes_speedups, time_speedups):
+    x = np.arange(len(benchmarks))  # 每组柱子的 x 坐标
+    width = 0.35  # 柱子宽度
+
+    fig, ax = plt.subplots(figsize=(10, 6))
+
+    # 绘制柱状图
+    bars1 = ax.bar(x - width/2, ptes_speedups, width, label='PTES Speedup', color='skyblue')
+    bars2 = ax.bar(x + width/2, time_speedups, width, label='Time Speedup', color='salmon')
+
+    # 添加标签和标题
+    ax.set_xlabel('Benchmarks')
+    ax.set_ylabel('Speedup')
+    ax.set_title('Speedups by Benchmark')
+    ax.set_xticks(x)
+    ax.set_xticklabels(benchmarks)
+    ax.legend()
+
+    # 添加数值标签
+    def add_labels(bars):
+        for bar in bars:
+            height = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2, height + 0.05, f'{height:.2f}', ha='center', va='bottom')
+
+    add_labels(bars1)
+    add_labels(bars2)
+
+    # 调整布局并显示图表
+    plt.tight_layout()
+    plt.savefig('draw.pdf', dpi=300)
+    # plt.savefig('draw.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
+    # plt.show()
+
+
+def main():
+    
+    benchmarks = ['redis', 'xsbench', 'liblinear', 'graph500', 'memcached']
+    ptes_speedups = []
+    time_speedups = []
+    for benchmark in benchmarks:
+        ptes_speedup, time_speedup = check_benchmark(benchmark)
+        ptes_speedups.append(ptes_speedup)
+        time_speedups.append(time_speedup)
+
+    # print(ptes_speedups, time_speedups)
+    plot_speedups(benchmarks, ptes_speedups, time_speedups)
+    # # 绘制曲线
+    # plt.plot(A_values, label='Acessed PTEs', color='green')
+    # plt.plot(T_values, label='Total Page Walks', color='red')
+    # plt.plot(opt_A_values, label='Opt Acessed PTEs', color='blue')
+    # plt.plot(opt_T_values, label='Opt Page Walks)', color='orange')
+    
+    # # 添加标题和标签
+    # # plt.title('Optimized Page Table Scan')
+    # plt.xlabel('Time (minute)')
+    # plt.ylabel('Count(k)')
+    
+    # # 显示图例
+    # plt.legend()
+    # plt.savefig(f'pt_scan_{name}.pdf', dpi=300)
+    # plt.savefig('pt_scan.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
+    
 
 if __name__ == "__main__":
     main()

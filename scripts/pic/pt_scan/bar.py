@@ -19,11 +19,14 @@ def get_data(file_path):
 
 def main():
     # 读取数据
-    A_values, T_values = get_data("vma.log")
+    name = 'memcached'
+    base_name = name + ".log"
+    opt_name = name + "_opt.log"
+    A_values, T_values = get_data(base_name)
     average_A = sum(A_values) / len(A_values)
     average_T = sum(T_values) / len(T_values)
 
-    opt_A_values, opt_T_values = get_data("vma_opt.log")
+    opt_A_values, opt_T_values = get_data(opt_name)
     opt_average_A = sum(opt_A_values) / len(opt_A_values)
     opt_average_T = sum(opt_T_values) / len(opt_T_values)
 
@@ -67,7 +70,7 @@ def main():
 
     # 调整布局并保存
     plt.tight_layout()
-    plt.savefig("pt_scan_bar.pdf", dpi=300)
+    plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
     plt.show()
 
 
