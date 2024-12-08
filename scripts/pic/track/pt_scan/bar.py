@@ -42,10 +42,10 @@ def main():
     fig, ax = plt.subplots(figsize=(8, 6))
     #ffc000 #0070c0
     bars1 = ax.bar(
-        x - width / 2, original_values, width, label="Accessed PTEs", color="#ffcac4", linewidth=1, edgecolor="black"
+        x - width / 2, original_values, width, label="Accessed PTEs", color="#ffbfbf", linewidth=1, edgecolor="black"
     )
     bars2 = ax.bar(
-        x + width / 2, optimized_values, width, label="Total Scan PTEs", color="#bdd4fe", linewidth=1, edgecolor="black"
+        x + width / 2, optimized_values, width, label="Total Scan PTEs", color="#ff3f3f", linewidth=1, edgecolor="black"
     )
     ax.tick_params(direction='in')
 

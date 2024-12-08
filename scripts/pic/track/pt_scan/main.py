@@ -63,22 +63,24 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # 绘制柱状图
-    bars1 = ax.bar(x - width/2, ptes_speedups, width, label='PTES Speedup', color='skyblue')
-    bars2 = ax.bar(x + width/2, time_speedups, width, label='Time Speedup', color='salmon')
+    bars1 = ax.bar(x - width/2, ptes_speedups, width, label='PTES Speedup', color='#bfbfef', linewidth=0.5, edgecolor="black")
+    bars2 = ax.bar(x + width/2, time_speedups, width, label='Time Speedup', color='#3f3fcf', linewidth=0.5, edgecolor="black")
 
     # 添加标签和标题
-    ax.set_xlabel('Benchmarks')
-    ax.set_ylabel('Speedup')
-    ax.set_title('Speedups by Benchmark')
+    ax.tick_params(direction='in')
+    # ax.set_xlabel('Benchmarks')
+    ax.set_ylabel('Speedup(%)', fontsize=16)
+    # ax.set_title('Speedups by Benchmark')
     ax.set_xticks(x)
-    ax.set_xticklabels(benchmarks)
-    ax.legend()
+    plt.yticks(fontsize=12)
+    ax.set_xticklabels(benchmarks, fontsize=12)
+    ax.legend(fontsize=12)
 
     # 添加数值标签
     def add_labels(bars):
         for bar in bars:
             height = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2, height + 0.05, f'{height:.2f}', ha='center', va='bottom')
+            ax.text(bar.get_x() + bar.get_width()/2, height + 0.05, f'{height:.2f}', ha='center', va='bottom', fontsize=12)
 
     add_labels(bars1)
     add_labels(bars2)
@@ -92,7 +94,7 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
 
 def main():
     
-    benchmarks = ['redis', 'xsbench', 'liblinear', 'graph500', 'memcached']
+    benchmarks = ['redis', 'xsbench', 'memcached','liblinear', 'graph500']
     ptes_speedups = []
     time_speedups = []
     for benchmark in benchmarks:

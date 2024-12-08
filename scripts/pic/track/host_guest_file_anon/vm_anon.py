@@ -37,10 +37,10 @@ plt.figure(figsize=(10, 6))
 linewidth = 2.5
 
 # 绘制宿主机数据并在每条线上均匀添加标记
-plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#0070c0", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
-plt.plot(x, host_file_pages_list, label="Host VM File", color="#ffc000", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="#5b9bd5", linewidth=linewidth, marker='^', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_file_pages_list, label="Guest File", color="#ed7d31", linewidth=linewidth, marker='D', markersize=5, markevery=len(x)//10)
+plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#ff1900", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
+plt.plot(x, host_file_pages_list, label="Host VM File", color="#ff8080", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
+plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="#0000ff", linewidth=linewidth, marker='^', markersize=5, markevery=len(x)//10)
+plt.plot(x, guest_file_pages_list, label="Guest File", color="#7f7fff", linewidth=linewidth, marker='D', markersize=5, markevery=len(x)//10)
 
 # 添加标题和标签
 plt.xlabel("Time (minute)", fontsize=20)
