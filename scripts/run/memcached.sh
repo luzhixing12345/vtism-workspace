@@ -11,9 +11,8 @@ fi
 echo "--- run memcached ${size} ---"
 
 run_memcached() {
-    memcached_path=${current_dir}/benchmark/memcached-7.4.0
-    memcached_server_exe=${memcached_path}/src/memcached-server
-    memcached_server_args=${memcached_path}/memcached.conf
+    memcached_path=${current_dir}/benchmark/memcached
+    memcached_server_exe=${memcached_path}/memcached
 
     ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
     workload_path=${memcached_path}/workloada.${size}
@@ -21,7 +20,7 @@ run_memcached() {
 
     # run memcached server in backend
     echo "start memcached server in backend"
-    ${memcached_server_exe} ${memcached_server_args} &
+    ${memcached_server_exe} &
 
     # should wait until loading is done
     # or cause error: LOADING memcached is loading the dataset in memory
