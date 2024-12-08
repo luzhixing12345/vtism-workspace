@@ -15,7 +15,7 @@ run_memcached() {
     memcached_server_exe=${memcached_path}/memcached
 
     ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
-    workload_path=${memcached_path}/workloada.${size}
+    workload_path=${current_dir}/benchmark/workloada.${size}
     ycsb_args="load memcached -s -P $workload_path -threads 10 -p memcached.hosts=localhost -p memcached.port=11211"
 
     # run memcached server in backend
