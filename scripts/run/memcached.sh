@@ -1,0 +1,36 @@
+
+current_dir=`pwd`
+source ${current_dir}/scripts/check_env.sh
+source ${current_dir}/scripts/kernel_config.sh
+
+size=$1
+if [ -z "$size" ]; then
+    size="large"
+fi
+
+echo "--- run memcached ${size} ---"
+
+run_memcached() {
+    memcached_path=${current_dir}/benchmark/memcached-7.4.0
+    memcached_server_exe=${memcached_path}/src/memcached-server
+    memcached_server_args=${memcached_path}/memcached.conf
+
+    ycsb_exe=${current_dir}/benchmark/ycsb-0.17.0/bin/ycsb
+    workload_path=${memcached_path}/workloada.${size}
+    ycsb_args="load memcached -s -P $workload_path -threads 10 -p memcached.hosts=localhost -p memcached.port=11211"
+
+    # run memcached server in backend
+    echo "start memcached server in backend"
+    ${memcached_server_exe} ${memcached_server_args} &
+
+    # should wait until loading is done
+    # or cause error: LOADING memcached is loading the dataset in memory
+    # check_memcached_loading
+    sleep 5
+
+    run ${ycsb_exe} ${ycsb_args}
+    
+    kill -9 `pgrep memcached`
+}
+
+run_memcached

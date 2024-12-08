@@ -12,4 +12,4 @@ run ${pr_exe} ${pr_args}
 
 # RSS: 10.7GB
 # CPU: high cpu usage
-# Time: long
+# Time: very long
