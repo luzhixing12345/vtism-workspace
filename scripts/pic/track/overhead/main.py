@@ -4,15 +4,15 @@ import numpy as np
 
 def main():
     # 数据
-    graph500 = {0: 210.13, 1000: 210.89, 2000: 210.68, 4000: 210.68, 10000: 376.89}
-    liblinear = {0: 376.43, 1000: 426.36, 2000: 398.57, 4000: 177.91, 10000: 376.89}
-    xsbench = {0: 79.09, 1000: 203.52, 2000: 191.08, 4000: 88.75, 10000: 376.89}
-    redis = {0: 220.13, 1000: 230.16, 2000: 240.10, 4000: 177.91, 10000: 376.89}
-    memcached = {0: 210.13, 1000: 215.18, 2000: 225.15, 4000: 177.91, 10000: 376.89}
+    graph500 = {0: 208.98, 1000: 209.99, 2000: 209.82, 5000: 209.6, 10000: 209.1}
+    liblinear = {0: 375.70, 1000: 432.51, 2000: 396.80, 5000: 376.99, 10000: 376.89}
+    pr = {0: 238.19, 1000: 323.79, 2000: 279.00, 5000: 261.67, 10000: 248.42}
+    redis = {0: 213.46, 1000: 231.11, 2000: 224.43, 5000: 219.25, 10000: 218.23}
+    memcached = {0: 77.14, 1000: 78.87, 2000: 78.66, 5000: 78.36, 10000:  78.16}
 
-    benchmarks = ["graph500", "liblinear", "xsbench", "redis", "memcached"]
-    time_points = [500, 1000, 2000, 4000]
-    data = [graph500, liblinear, xsbench, redis, memcached]
+    time_points = [1000, 2000, 5000, 10000]
+    data = [graph500, liblinear, pr, redis, memcached]
+    benchmarks = ["graph500", "liblinear", "pr", "redis", "memcached"]
 
     # 计算 overhead
     overhead_data = []
@@ -48,6 +48,9 @@ def main():
     ax.set_xticklabels(benchmarks)
     ax.tick_params(direction="in")
     ax.legend(title="scan interval", fontsize=10)
+
+    # 纵轴 5 的位置画一条横线
+    ax.axhline(5, color="black", linestyle="--", linewidth=0.5)
 
     # 显示图形
     plt.tight_layout()

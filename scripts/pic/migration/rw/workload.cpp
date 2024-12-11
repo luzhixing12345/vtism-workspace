@@ -19,7 +19,8 @@ struct page {
     unsigned long entry[512];
 };
 
-void synthetic_workload(int wi, long period_ns, std::vector<double> &throughput_result) {  // wi 为写操作的概率百分比
+void synthetic_workload(int wi, long period_ns, std::vector<double> &throughput_result) { 
+    // wi 为写操作的概率百分比
     // 声明并初始化变量
     unsigned long nbOps = 0, nbOps_prev = 0;
     double throughput = 0.0;
