@@ -1,7 +1,7 @@
 <domain type='kvm'>
   <name>vm0</name>
-  <memory unit='GiB'>64</memory>
-  <vcpu placement='static'>16</vcpu>
+  <memory unit='GiB'>32</memory>
+  <vcpu placement='static'>8</vcpu>
   <cpu mode='host-passthrough'/>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
@@ -20,7 +20,7 @@
       <alias name='net0'/>
       <portForward proto='tcp'>
             <range start='2222' to='22'/>
-        </portForward>
+      </portForward>
     </interface>
     <serial type='pty'>
       <source path='/dev/pts/1'/>

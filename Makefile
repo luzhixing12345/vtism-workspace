@@ -172,7 +172,7 @@ vm_share:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
 
-SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=1G \
+SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=64M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 vm_tmm:
 	taskset -c 0-7 $(QEMU) -name guest=vm0,debug-threads=off \

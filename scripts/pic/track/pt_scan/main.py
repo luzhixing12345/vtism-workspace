@@ -85,9 +85,7 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
     add_labels(bars1)
     add_labels(bars2)
 
-    # 调整布局并显示图表
-    plt.tight_layout()
-    plt.savefig('draw.pdf', dpi=300)
+    
     # plt.savefig('draw.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
     # plt.show()
 
@@ -104,6 +102,9 @@ def main():
 
     # print(ptes_speedups, time_speedups)
     plot_speedups(benchmarks, ptes_speedups, time_speedups)
+    # 调整布局并显示图表
+    plt.tight_layout()
+    plt.savefig('draw.pdf', dpi=300)
     # # 绘制曲线
     # plt.plot(A_values, label='Acessed PTEs', color='green')
     # plt.plot(T_values, label='Total Page Walks', color='red')
