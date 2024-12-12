@@ -6,13 +6,14 @@ def main():
     # 数据
     graph500 = {0: 208.98, 1000: 209.99, 2000: 209.82, 5000: 209.6, 10000: 209.1}
     liblinear = {0: 375.70, 1000: 432.51, 2000: 396.80, 5000: 376.99, 10000: 376.89}
-    pr = {0: 238.19, 1000: 323.79, 2000: 279.00, 5000: 261.67, 10000: 248.42}
+    # pr = {0: 238.19, 1000: 323.79, 2000: 279.00, 5000: 261.67, 10000: 248.42}
+    xsbench = {0: 40.91, 1000: 46.76, 2000: 46.10, 5000: 42.82, 10000: 41.85}
     redis = {0: 213.46, 1000: 231.11, 2000: 224.43, 5000: 219.25, 10000: 218.23}
     memcached = {0: 77.14, 1000: 78.87, 2000: 78.66, 5000: 78.36, 10000:  78.16}
 
     time_points = [1000, 2000, 5000, 10000]
-    data = [graph500, liblinear, pr, redis, memcached]
-    benchmarks = ["graph500", "liblinear", "pr", "redis", "memcached"]
+    data = [graph500, liblinear, xsbench, redis, memcached]
+    benchmarks = ["graph500", "liblinear", "xsbench", "redis", "memcached"]
 
     # 计算 overhead
     overhead_data = []

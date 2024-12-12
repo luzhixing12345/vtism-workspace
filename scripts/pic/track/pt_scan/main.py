@@ -63,7 +63,7 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     # 绘制柱状图
-    bars1 = ax.bar(x - width/2, ptes_speedups, width, label='PTES Speedup', color='#bfbfef', linewidth=0.5, edgecolor="black")
+    bars1 = ax.bar(x - width/2, ptes_speedups, width, label='PTEs Speedup', color='#bfbfef', linewidth=0.5, edgecolor="black")
     bars2 = ax.bar(x + width/2, time_speedups, width, label='Time Speedup', color='#3f3fcf', linewidth=0.5, edgecolor="black")
 
     # 添加标签和标题
@@ -92,7 +92,7 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
 
 def main():
     
-    benchmarks = ['redis', 'xsbench', 'memcached','liblinear', 'graph500']
+    benchmarks = ['redis', "xsbench", 'memcached','liblinear', 'graph500']
     ptes_speedups = []
     time_speedups = []
     for benchmark in benchmarks:
