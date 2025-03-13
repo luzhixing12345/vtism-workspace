@@ -1,5 +1,5 @@
 #!/bin/bash
 
-file=/home/lzx/gpt-trace/pt_scan/*.ko
+file=/home/lzx/vtism/mm/vtism/vtism.ko
 sudo cp $file tmp/home/kamilu
 

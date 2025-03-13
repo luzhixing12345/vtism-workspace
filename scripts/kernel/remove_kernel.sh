@@ -21,7 +21,7 @@ done
 echo ""
 
 # Prompt the user to select a kernel version by number
-read -p "Enter the number of the kernel version you want to switch to: " kernel_number
+read -p "Enter the number of the kernel version you want to delete: " kernel_number
 
 # Check if the input is a number and within the range
 if ! [[ "$kernel_number" =~ ^[0-9]+$ ]] || [ "$kernel_number" -lt "0" ] || [ "$kernel_number" -ge "$count" ]; then

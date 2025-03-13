@@ -38,9 +38,9 @@ run() {
     # 获取中间的参数
     program_args="$@"
     echo "Running: $exe_name $program_args"
-    # 执行程序并记录 real time，同时将 stdout 和 stderr 输出到日志文件
+    # 执行程序并记录 real time,同时将 stdout 和 stderr 输出到日志文件
     {
-        # 使用 time 统计执行时间，只记录 real time
+        # 使用 time 统计执行时间,只记录 real time
         real_time=$((time -p $executable $program_args > /dev/null) 2>&1 | awk '/real/ {print $2}')
         echo "[$exe_name]: $real_time"
     } >> "$LOG_FILE" 2>&1

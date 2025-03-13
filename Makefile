@@ -54,6 +54,7 @@ BZIMAGE = $(IMAGE)/$(X86_KERNEL_PLACE)
 MEMORY_SIZE = 1G
 
 DISK=disk/ubuntu.raw
+DISK2=disk/ubuntu2.raw
 ISO_DISK=iso/ubuntu-24.04-live-server-amd64.iso
 
 MINI_DISK=disk/mini.img
@@ -172,17 +173,22 @@ vm_share:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
 
-SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=64M \
+SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=256M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
-vm_tmm:
-	taskset -c 0-7 $(QEMU) -name guest=vm0,debug-threads=off \
+
+SHARED_MEM1 = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm1,size=256M \
+    -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
+
+NODE=1
+
+vm0:
+	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 32G \
+    -m 96G \
     -enable-kvm \
     -overcommit mem-lock=off \
-    -smp 8 \
-    -uuid 9bc02bdb-58b3-4bb0-b00e-313bdae0ac81 \
+    -smp 16,sockets=1,cores=16,threads=1 \
     -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
     -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
     -drive file=$(DISK),format=raw,id=drive-ide0-0-0,if=none \
@@ -197,20 +203,43 @@ vm_tmm:
     -append "root=/dev/sda2 console=ttyS0 quiet" \
 	$(SHARED_MEM)
 
-vm_tmm_numa:
-	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
+vm1:
+	taskset -c 48-63 $(QEMU) -name guest=vm1,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 64G \
+    -m 96G \
     -enable-kvm \
     -overcommit mem-lock=off \
-    -smp 16 \
-    -object memory-backend-ram,size=16G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
-    -object memory-backend-ram,size=16G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
-	-object memory-backend-ram,size=16G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
-    -object memory-backend-ram,size=16G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
-    -numa node,nodeid=0,memdev=m0,cpus=0-7 \
-    -numa node,nodeid=1,memdev=m1,cpus=8-15 \
+    -smp 16,sockets=1,cores=16,threads=1 \
+    -device ich9-usb-ehci1,id=usb,bus=pci.0,addr=0x5.0x7 \
+    -device virtio-serial-pci,id=virtio-serial0,bus=pci.0,addr=0x6 \
+    -drive file=$(DISK2),format=raw,id=drive-ide0-0-0,if=none \
+    -device ide-hd,bus=ide.0,unit=0,drive=drive-ide0-0-0,id=ide0-0-0,bootindex=1 \
+    -drive if=none,id=drive-ide0-0-1,readonly=on \
+    -device ide-cd,bus=ide.0,unit=1,drive=drive-ide0-0-1,id=ide0-0-1 \
+    -device virtio-balloon-pci,id=balloon0,bus=pci.0,addr=0x7 \
+    -netdev user,id=ndev.0,hostfwd=tcp::4444-:22 \
+    -device e1000,netdev=ndev.0 \
+    -nographic \
+	-kernel $(BZIMAGE) \
+    -append "root=/dev/sda2 console=ttyS0 quiet" \
+	$(SHARED_MEM1)
+
+
+vnuma:
+	$(QEMU) -name guest=vm0,debug-threads=off \
+    -machine pc \
+    -cpu host \
+    -m 128G \
+    -enable-kvm \
+    -overcommit mem-lock=off \
+    -smp 8 \
+    -object memory-backend-ram,size=32G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=32G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=32G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=32G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -numa node,nodeid=0,memdev=m0,cpus=0-3 \
+    -numa node,nodeid=1,memdev=m1,cpus=4-7 \
 	-numa node,nodeid=2,memdev=m2 \
     -numa node,nodeid=3,memdev=m3 \
 	-numa dist,src=0,dst=0,val=10 \
