@@ -42,10 +42,10 @@ run() {
     {
         # 使用 time 统计执行时间,只记录 real time
         real_time=$((time -p $executable $program_args > /dev/null) 2>&1 | awk '/real/ {print $2}')
-        echo "[$exe_name]: $real_time"
+        echo -e "[benchmark]\ncmd:$exe_name $program_args\ntime: $real_time"
     } >> "$LOG_FILE" 2>&1
 
-    echo "[$exe_name]: $real_time"
+    echo -e "[benchmark]\ncmd:$exe_name $program_args\ntime: $real_time"
     flush_cache
 }
 
