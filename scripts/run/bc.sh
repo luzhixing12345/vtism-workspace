@@ -3,12 +3,12 @@
 current_dir=`pwd`
 source ${current_dir}/scripts/kernel_config.sh
 
-echo "--- run pr ---"
+echo "--- run bc ---"
 
 # gapbs
-pr_exe=${current_dir}/benchmark/gapbs/pr
-pr_args="-u29 -k20 -i10 -n10"
-run ${pr_exe} ${pr_args}
+bc_exe=${current_dir}/benchmark/gapbs/bc
+bc_args="-u29 -k20 -i10 -n10"
+run ${bc_exe} ${bc_args}
 
 # RSS: 82GB
 # CPU: high cpu usage

@@ -5,7 +5,7 @@ source ${current_dir}/scripts/kernel_config.sh
 
 size=$1
 if [ -z "$size" ]; then
-    size="large"
+    size="huge"
 fi
 
 echo "--- run redis ${size} ---"
@@ -34,3 +34,6 @@ run_redis() {
 }
 
 run_redis
+
+# RSS: 95.9GB
+# CPU: low cpu usage

@@ -65,7 +65,7 @@ NET_ARG = -net nic,model=e1000 -net user,hostfwd=tcp::2222-:22
 
 VIRTIO_ARGS = -chardev socket,id=char0,path=/tmp/vhostqemu -device vhost-user-fs-pci,queue-size=1024,chardev=char0,tag=myfs -object memory-backend-file,id=mem,size=4G,mem-path=/dev/shm,share=on -numa node,memdev=mem -m 4G
 
-default: vm_tmm
+default: vm0 
 
 init:
 	cd ./initramfs && find . | cpio -ov --format=newc | gzip -9 > ../$(INITRAMFS)

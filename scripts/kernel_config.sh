@@ -96,3 +96,7 @@ change_hugepage_defrag() {
     fi
 }
 
+
+finish() {
+    e2me run
+}

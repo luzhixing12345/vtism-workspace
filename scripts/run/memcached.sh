@@ -5,7 +5,7 @@ source ${current_dir}/scripts/kernel_config.sh
 
 size=$1
 if [ -z "$size" ]; then
-    size="large"
+    size="huge"
 fi
 
 echo "--- run memcached ${size} ---"
@@ -25,7 +25,7 @@ run_memcached() {
     # should wait until loading is done
     # or cause error: LOADING memcached is loading the dataset in memory
     # check_memcached_loading
-    sleep 5
+    sleep 10
 
     run ${ycsb_exe} ${ycsb_args}
     
