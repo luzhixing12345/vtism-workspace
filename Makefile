@@ -185,7 +185,7 @@ vm0:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 96G \
+    -m 64G \
     -enable-kvm \
     -overcommit mem-lock=off \
     -smp 16,sockets=1,cores=16,threads=1 \
@@ -207,7 +207,7 @@ vm1:
 	taskset -c 48-63 $(QEMU) -name guest=vm1,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 96G \
+    -m 64G \
     -enable-kvm \
     -overcommit mem-lock=off \
     -smp 16,sockets=1,cores=16,threads=1 \

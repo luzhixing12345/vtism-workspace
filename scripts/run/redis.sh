@@ -35,5 +35,5 @@ run_redis() {
 
 run_redis
 
-# RSS: 95.9GB
+# RSS: 58GB
 # CPU: low cpu usage

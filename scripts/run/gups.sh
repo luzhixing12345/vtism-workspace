@@ -7,9 +7,9 @@ echo "--- run gups ---"
 
 gups_exe=${current_dir}/benchmark/gups_bench/gups
 
-gups_args="34 1000000 1024"
+gups_args="33 1000000 1024"
 run mpirun "-np 4 ${gups_exe} ${gups_args}"
 
-# RSS: 128GB
+# RSS: 64GB
 # CPU: low cpu usage
 # Time: very long

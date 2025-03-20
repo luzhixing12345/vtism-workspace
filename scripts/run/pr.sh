@@ -7,9 +7,9 @@ echo "--- run pr ---"
 
 # gapbs
 pr_exe=${current_dir}/benchmark/gapbs/pr
-pr_args="-u29 -k20 -i10 -n10"
+pr_args="-u27 -k24 -i10 -n10"
 run ${pr_exe} ${pr_args}
 
-# RSS: 82GB
+# RSS: 50GB
 # CPU: high cpu usage
 # Time: very long
