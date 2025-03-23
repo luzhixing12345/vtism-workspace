@@ -133,10 +133,10 @@ NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
 MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
 # BZIMAGE=$(TPP_BZIMAGE)
 # BZIMAGE=$(BASIC_510_BZIMAGE)
-# BZIMAGE=$(NOMAD_BZIMAGE)
-BZIMAGE=$(MEMTIS_BZIMAGE)
+# BZIMAGE=$(TPP_BZIMAGE)
+# BZIMAGE=$(MEMTIS_BZIMAGE)
 BZIMAGE=$(VTISM_BZIMAGE)
-
+# BZIMAGE=/home/lzx/code/linux-5.4.49/arch/x86/boot/bzImage
 vtism:
 	taskset -c 48-55 $(QEMU) \
 	-kernel $(BZIMAGE) \
@@ -173,10 +173,10 @@ vm_share:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
 
-SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=256M \
+SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=128M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 
-SHARED_MEM1 = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm1,size=256M \
+SHARED_MEM1 = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm1,size=128M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 
 NODE=1

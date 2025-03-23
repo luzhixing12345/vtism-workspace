@@ -8,6 +8,7 @@ output
 *.xz
 *.rdb
 benchmark/ycsb-0.17.0/
+benchmark/spec2017/
 *.model
 *.json
 *.pdf

@@ -1,3 +1,4 @@
+#!/bin/bash
 
 # 定义字典 (关联数组) 映射内核名称到 setup 函数
 declare -A available_kernel_setups=(
@@ -7,13 +8,16 @@ declare -A available_kernel_setups=(
     ["5.3.0-autotiering"]="setup_autotiering"
     ["5.6.0-rc6nimble+"]="setup_nimble"
     ["6.6.0damon+"]="setup_base"
+    ["6.6.0vtism+"]="setup_vtism"
 )
 
 choose_kernel_setup() {
     KERNEL_VERSION=$(uname -r)
+    echo "Kernel version: ${KERNEL_VERSION}"
     if [[ -n "${available_kernel_setups[$KERNEL_VERSION]}" ]]; then
         # 动态调用字典中存储的函数名
         ${available_kernel_setups[$KERNEL_VERSION]}
+        echo "finish init setup for ${KERNEL_VERSION}"
     else
         echo "Kernel version ${KERNEL_VERSION} not found in available kernels: ${!available_kernel_setups[@]}"
         exit 1
@@ -29,7 +33,7 @@ setup_tpp() {
 }
 
 setup_nomad() {
-    cd src/nomad_module && make clean && make && insmod async_promote.ko
+    sudo insmod kernel/async_promote.ko
     echo 1 >/sys/kernel/mm/numa/demotion_enabled
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
@@ -51,8 +55,8 @@ setup_nimble() {
     # 在这里实现具体的设置逻辑
 }
 
-setup_base() {
-    echo "Setup for base"
+setup_vtism() {
+    echo "Setup for vtism"
 }
 
 system_init() {
@@ -65,3 +69,5 @@ system_init() {
 
     choose_kernel_setup
 }
+
+system_init

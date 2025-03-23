@@ -4,6 +4,7 @@ KERNEL_VERSION="tpp"
 # KERNEL_VERSION="autonuma"
 # KERNEL_VERSION="autotiering"
 LOG_FILE=${current_dir}/output/${KERNEL_VERSION}-benchmark.log
+echo "log file: ${LOG_FILE}"
 
 # if LOG_FILE DIRECTORY does not exist, create it
 if [ ! -d ${current_dir}/output ]; then
