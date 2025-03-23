@@ -1,5 +1,8 @@
-
-KERNEL_VERSION=$(uname -r)
+KERNEL_VERSION="tpp"
+# KERNEL_VERSION="nomad"
+# KERNEL_VERSION="memtis"
+# KERNEL_VERSION="autonuma"
+# KERNEL_VERSION="autotiering"
 LOG_FILE=${current_dir}/output/${KERNEL_VERSION}-benchmark.log
 
 # if LOG_FILE DIRECTORY does not exist, create it
