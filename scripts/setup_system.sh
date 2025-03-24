@@ -11,6 +11,12 @@ declare -A available_kernel_setups=(
     ["6.6.0vtism+"]="setup_vtism"
 )
 
+# 检查是否使用了 root 权限
+if [[ $EUID -ne 0 ]]; then
+   echo "This script must be run as root" 
+   exit 1
+fi
+
 choose_kernel_setup() {
     KERNEL_VERSION=$(uname -r)
     echo "Kernel version: ${KERNEL_VERSION}"
