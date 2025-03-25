@@ -7,7 +7,7 @@ declare -A available_kernel_setups=(
     ["5.15.19-htmm"]="setup_htmm"       # 你可以在这里添加相应的函数
     ["5.3.0-autotiering"]="setup_autotiering"
     ["5.6.0-rc6nimble+"]="setup_nimble"
-    ["6.6.0damon+"]="setup_base"
+    ["6.6.0autonuma+"]="setup_autonuma"
     ["6.6.0vtism+"]="setup_vtism"
 )
 
@@ -33,6 +33,7 @@ choose_kernel_setup() {
 # 示例 setup 函数
 setup_tpp() {
     echo 1 >/sys/kernel/mm/numa/demotion_enabled
+    # https://docs.kernel.org/admin-guide/sysctl/kernel.html#numa-balancing
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
     echo 1000 >/proc/sys/vm/demote_scale_factor
@@ -44,6 +45,11 @@ setup_nomad() {
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
     echo 1000 >/proc/sys/vm/demote_scale_factor
+}
+
+setup_autonuma() {
+    echo 1 >/proc/sys/kernel/numa_balancing
+    swapoff -a
 }
 
 setup_htmm() {
@@ -63,6 +69,10 @@ setup_nimble() {
 
 setup_vtism() {
     echo "Setup for vtism"
+    echo 1 >/sys/kernel/mm/numa/demotion_enabled
+    echo 2 >/proc/sys/kernel/numa_balancing
+    swapoff -a
+    echo 1000 > /proc/sys/vm/watermark_scale_factor
 }
 
 system_init() {
@@ -76,4 +86,12 @@ system_init() {
     choose_kernel_setup
 }
 
+run_mem_stress() {
+    echo "---- run mem stress ----"
+    # left 10GB free memory for system
+    nohup ./userspace/mem_stress 0 22 > /dev/null 2>&1 & 
+    nohup ./userspace/mem_stress 1 22 > /dev/null 2>&1 & 
+}
+
 system_init
+run_mem_stress

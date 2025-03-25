@@ -6,7 +6,7 @@ THIRD_LIB = glib-2.0 libvirt
 CFLAGS = $(shell pkg-config --cflags $(THIRD_LIB))
 LDFLAGS = $(shell pkg-config --libs $(THIRD_LIB))
 
-all: qemu_connect
+all: qemu_connect mem_stress
 
 XBOX = xargparse.o xstring.o
 
@@ -19,3 +19,6 @@ qemu_connect: qemu_connect.o $(XBOX)
 
 clean:
 	rm *.o qemu_connect
+
+mem_stress: mem_stress.c
+	$(CC) $^ $(LDFLAGS) -lnuma -o $@

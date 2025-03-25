@@ -9,9 +9,9 @@ echo "--- run xsbench ---"
 # ./XSBench -t 48 -g 680000 -p 15000000
 
 xsbench_exe=${current_dir}/benchmark/xsbench/src/XSBench
-xsbench_arg="-t 16 -g 1200000 -p 15000000"
+xsbench_arg="-p 2000000 -g 30000"
 run ${xsbench_exe} ${xsbench_arg}
 
-# RSS: 44GB
+# RSS: 14GB
 # CPU: low cpu usage
 # Time: 675

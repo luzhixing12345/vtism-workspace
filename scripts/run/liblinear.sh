@@ -8,7 +8,7 @@ echo "--- run liblinear ---"
 run_liblinear() {
     liblinear_path=${current_dir}/benchmark/liblinear-multicore-2.47
     liblinear_exe=${liblinear_path}/train
-    liblinear_args="-s 6 -m 16 -e 0.000001 -p 0.01 ${liblinear_path}/HIGGS"
+    liblinear_args="-s 6 -m 16 -e 0.000001 ${liblinear_path}/HIGGS"
     rm -f /tmp/liblinear_initialized
     rm -f /tmp/liblinear_thrashed
     flush_cache
@@ -35,3 +35,5 @@ run_liblinear() {
 }
 
 run_liblinear
+
+# RSS 9.65GB

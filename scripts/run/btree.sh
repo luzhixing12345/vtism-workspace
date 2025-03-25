@@ -7,10 +7,11 @@ echo "--- run btree ---"
 
 btree_exe=${current_dir}/benchmark/btree/btree
 
-# -n 1<<30
-btree_args="-- -n 1073741824 -l 50000000"
+# -n 1<<28
+n=268435456
+btree_args="-- -n $n -l 50000000"
 run ${btree_exe} ${btree_args}
 
-# RSS: 64GB
+# RSS: 16GB
 # CPU: low cpu usage
 # Time: very long
