@@ -14,3 +14,5 @@ benchmark/spec2017/
 *.pdf
 *.txt
 *.log
+/gpt-trace/
+/pcm/
