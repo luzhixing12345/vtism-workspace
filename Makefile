@@ -135,7 +135,7 @@ MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
 # BZIMAGE=$(BASIC_510_BZIMAGE)
 # BZIMAGE=$(TPP_BZIMAGE)
 # BZIMAGE=$(MEMTIS_BZIMAGE)
-BZIMAGE=$(VTISM_BZIMAGE)
+BZIMAGE=/home/lzx/code/linux-6.6/arch/x86/boot/bzImage
 # BZIMAGE=/home/lzx/code/linux-5.4.49/arch/x86/boot/bzImage
 vtism:
 	taskset -c 48-55 $(QEMU) \
@@ -173,10 +173,10 @@ vm_share:
 	-kernel $(BZIMAGE) \
     -append "root=/dev/sda2 console=ttyS0 quiet"
 
-SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=128M \
+SHARED_MEM = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm,size=64M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 
-SHARED_MEM1 = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm1,size=128M \
+SHARED_MEM1 = -object memory-backend-file,id=shmem1,share=on,mem-path=/dev/shm/my_shm1,size=64M \
     -device ivshmem-plain,memdev=shmem1,id=ivshmem1,bus=pci.0,addr=0xb
 
 NODE=1
@@ -185,7 +185,7 @@ vm0:
 	taskset -c 0-15 $(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 64G \
+    -m 32G \
     -enable-kvm \
     -overcommit mem-lock=off \
     -smp 16,sockets=1,cores=16,threads=1 \

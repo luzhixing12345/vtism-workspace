@@ -8,7 +8,7 @@ def get_data(file_path):
         content = f.read()
         
     # 正则表达式匹配 A/T 的值
-    pattern = re.compile(r'Page walk result: A/T: (\d+)/(\d+) \((\d+) microseconds\)')
+    pattern = re.compile(r'A/T: (\d+)/(\d+) \((\d+) ms\)')
     matches = re.findall(pattern, content)
     
     # 将匹配到的 A 和 T 分别提取出来
@@ -92,7 +92,7 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
 
 def main():
     
-    benchmarks = ['redis', "xsbench", 'memcached','liblinear', 'graph500']
+    benchmarks = ['redis', "xsbench", 'pr', 'graph500']
     ptes_speedups = []
     time_speedups = []
     for benchmark in benchmarks:
@@ -104,7 +104,8 @@ def main():
     plot_speedups(benchmarks, ptes_speedups, time_speedups)
     # 调整布局并显示图表
     plt.tight_layout()
-    plt.savefig('draw.pdf', dpi=300)
+    plt.savefig('pt_scan_opt_all.png', dpi=300)
+    plt.savefig('pt_scan_opt_all.pdf', dpi=300)
     # # 绘制曲线
     # plt.plot(A_values, label='Acessed PTEs', color='green')
     # plt.plot(T_values, label='Total Page Walks', color='red')

@@ -8,7 +8,7 @@ def get_data(file_path):
         content = f.read()
 
     # 正则表达式匹配 A/T 的值
-    pattern = re.compile(r"Page walk result: A/T: (\d+)/(\d+)")
+    pattern = re.compile(r"A/T: (\d+)/(\d+)")
     matches = re.findall(pattern, content)
 
     # 将匹配到的 A 和 T 分别提取出来
@@ -16,10 +16,11 @@ def get_data(file_path):
     T_values = [int(match[1]) for match in matches]
     return A_values, T_values
 
+import sys
 
 def main():
     # 读取数据
-    name = 'memcached'
+    name = sys.argv[1]
     base_name = name + ".log"
     opt_name = name + "_opt.log"
     A_values, T_values = get_data(base_name)
@@ -71,6 +72,7 @@ def main():
     # 调整布局并保存
     plt.tight_layout()
     plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
+    plt.savefig(f"pt_scan_{name}_bar.png", dpi=300)
     plt.show()
 
 

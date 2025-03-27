@@ -43,7 +43,7 @@ plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="#0000ff", linewidt
 plt.plot(x, guest_file_pages_list, label="Guest File", color="#7f7fff", linewidth=linewidth, marker='D', markersize=5, markevery=len(x)//10)
 
 # 添加标题和标签
-plt.xlabel("Time (minute)", fontsize=20)
+plt.xlabel("Time (minutes)", fontsize=20)
 plt.ylabel("Pages (GB)", fontsize=20)
 plt.xticks([])  # 去掉 x 轴刻度
 plt.tick_params(axis="both", direction="in", length=6)
@@ -60,7 +60,7 @@ plt.grid(True, linestyle="-", alpha=0.7)
 plt.tight_layout()
 
 # 保存图像到文件
-plt.savefig("anon_pages_comparison.pdf", dpi=300)
+plt.savefig("anon_pages_comparison.png", dpi=300)
 
 # 显示图形
 # plt.show()

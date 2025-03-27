@@ -34,7 +34,7 @@ def main():
     plt.tick_params(axis="both", direction="in")
     # 显示图例
     plt.legend()
-    plt.savefig("gpt-vs-ept.pdf", dpi=300)
+    plt.savefig("gpt-vs-ept.png", dpi=300)
     # plt.savefig('gpt-vs-ept.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
 
     # 显示图形
