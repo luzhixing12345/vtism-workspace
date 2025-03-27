@@ -2,23 +2,18 @@
 
 CC = gcc
 
-THIRD_LIB = glib-2.0 libvirt
-CFLAGS = $(shell pkg-config --cflags $(THIRD_LIB))
-LDFLAGS = $(shell pkg-config --libs $(THIRD_LIB))
+TARGET = mem_stress mem_access_1s
 
-all: qemu_connect mem_stress
-
-XBOX = xargparse.o xstring.o
-
-qemu_connect: qemu_connect.o $(XBOX)
-	$(CC) $^ $(LDFLAGS) -o $@
-
+all: $(TARGET)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-clean:
-	rm *.o qemu_connect
-
 mem_stress: mem_stress.c
 	$(CC) $^ $(LDFLAGS) -lnuma -o $@
+
+mem_access_1s: mem_access_1s.c
+	$(CC) $^ $(LDFLAGS) -o $@
+
+clean:
+	rm -f *.o $(TARGET)
