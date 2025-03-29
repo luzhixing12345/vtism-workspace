@@ -1,0 +1,7 @@
+
+*
+!.gitignore
+!*.c
+!Makefile
+!*.py
+!run.sh
