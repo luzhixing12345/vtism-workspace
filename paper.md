@@ -29,14 +29,60 @@
 
 统计了 liblinear， 使用了 HIGGS 数据集训练，结果证明宿主机会将所有 VMM 进程的页面均视作匿名页面， 而在虚拟机中统计结果发现其实还有来自 HIGGS 的大量的文件页没有被正确识别，linux内核中对于文件页和匿名页的回收策略有所不同，通常对于文件页的回收要比匿名页更加激进，大部分现有的工作也都考虑到了文件页和匿名页的差异来决定回收策略
 
-![](result/trace/host_guest_file_anon/anon_pages_comparison.png)
+![](result/track/host_guest_file_anon/anon_pages_comparison.png)
 
 redis
 
-![](./result/trace/gpt-vs-ept/gpt-vs-ept.png)
+![](./result/track/gpt-vs-ept/gpt-vs-ept.png)
 
+### State-of-the-art and limitations
 
 ## vtism design and implementation
+
+### overview
+
+### dynamic page tracking
+
+Linux 的页面迁移有同步迁移和异步迁移两种模式，同步迁移先尝试使用MIGRATE_ASYNC模式批量迁移folios
+
+如果批量迁移失败,则退回到逐个同步迁移每个folio [code](https://github.com/torvalds/linux/blob/ffc253263a1375a65fa6c9f62a893e9767fbebfa/mm/migrate.c#L1825)。
+
+但是我们注意到现在 linux 内核使用的异步迁移不是真正的异步操作，依然是同步顺序的 copy 页面并在循环中调用 cond_resched[code](https://github.com/torvalds/linux/blob/ffc253263a1375a65fa6c9f62a893e9767fbebfa/mm/util.c#L790C1-L801C2)
+
+多线程异步迁移，针对 页面提升（hot page migration） 和 页面降级（cold page demotion） 进行优化。思路是使用 工作队列（workqueue） 进行异步提交，并在后台完成页面迁移。
+
+在内核中，页面迁移（Page Migration）发生的原因多种多样，不同的迁移场景对执行顺序和阻塞行为有不同的要求。其中，一些页面迁移操作需要保持严格的执行顺序，因此必须同步进行并阻塞相关进程。例如内存规整（MR_COMPACTION），内存热插拔（MR_MEMORY_HOTPLUG）系统调用（MR_SYSCALL），调用 mbind 系统调用设置 memory policy 时触发的迁移（MR_MEMPOLICY_MBIND）等
+
+另一方面，某些迁移类型主要用于内核在系统层面优化内存访问模式，因而无需同步执行，可以采用异步机制在后台完成，以减少对前台任务的影响。例如页面提升（MR_NUMA_MISPLACED）和页面降级 （MR_DEMOTION）. 对于这些无需严格同步的迁移任务，内核可以采用异步方式进行后台迁移，以避免影响前台应用程序的执行效率。这种异步迁移策略可以提高系统的整体性能，同时保证内存资源的高效利用。
+
+页面提升和页面降级的特性不同，因此可以采用 不同的队列调度策略
+
+页面提升的目标是快速迁移高频访问的页到更快的存储（如 DRAM），先检查 目标 NUMA node 是否有足够的可用内存，避免迁移后导致回退。
+
+
+页面降级的目标是迁移低访问频率的页面到较慢的存储。 低优先级的后台线程可以在内存压力较低时异步迁移，避免影响前台进程性能，采用 时间窗口（time window）+ 访问统计，避免短期冷热变化导致频繁迁移（MGLRU）
+
+采用提升和降级双工作队列，不同的优先级任务交给不同的 worker。高优先级队列：处理页面提升，尽快将热点页面迁移到 DRAM，设置WQ_HIGHPRI：让热页迁移尽快完成，减少性能抖动；低优先级队列：处理页面降级，在 内存压力较低 时进行，设置WQ_UNBOUND：让调度更灵活，充分利用多核 CPU 资源。
+
+减少锁争用：使用 RCU 避免页表锁，避免高并发时 mmap_lock 带来的性能瓶颈；冷页迁移可以使用 trylock，减少锁等待对应用程序的影响
+
+预取优化：页面提升前，可以先检查目标地址是否存在 TLB entry，如果不存在，提前 prefetch 目标页面（prefetchw(new_page);）可以迁移后新页面的 TLB miss，提升访问速度。
+
+活跃进程对其活跃页面的访问是影响系统性能的关键因素。如果这些活跃页面位于慢速内存节点（如 CXL-DRAM 或 NVM），我们希望尽快将其迁移到高速内存节点（如 DRAM），以降低访问延迟。然而，页面迁移的前提是目标节点具备足够的可用内存，否则迁移操作将会失败，从而影响性能优化的效果。因此，在执行页面迁移时，确保目标节点的可用内存充足是至关重要的。
+
+为了解决这一问题，内核采用 空闲页面回收水位线（Watermark for Page Reclaim） 机制来决定何时启动页面回收。当系统空闲内存下降到设定的水位线以下时，内核会触发 页面降级（Page Demotion），即将 DRAM 中的冷页面迁移到 CXL-DRAM 或 NVM 等较慢的存储介质，以释放更多的 DRAM 资源。这一机制确保了当高优先级进程需要更多高速内存时，系统可以及时提供可用的 DRAM 页面，进而提高页面提升（Page Promotion）的成功率和效率。
+
+由于内存回收和页面降级涉及大量的数据迁移，其执行需要一定的时间。因此，系统必须提前预留足够的空闲内存空间，以保障后续页面提升操作能够顺利进行。换句话说，提高 页面提升的成功率和执行效率 是提升系统性能的核心目标，而更主动地进行 提前页面降级 则是实现这一目标的重要保障。通过合理调整页面回收策略，使降级与提升协同工作，可以有效优化内存资源的分配，提高整体系统性能。
+
+将内存页面从源位置迁移到目的位置需要四步：
+（1）在目标节点中分配新页面
+ (2) 取消映射要迁移的页面（包括使PTE失效）
+ (3) 将页面从源节点复制到目标节点
+（4）映射新页面（包括更新PTE）
+
+> (1) allocate new pages in the target node; (2) unmap pages to migrate (including invalidating PTE); (3) copy pages from source to target node; (4) map new pages (including updating PTE)
+
+
 
 ## evaluation and analysis
 
@@ -70,7 +116,7 @@ Hemem PEBS 虚拟化不合适
 
 我们的分析表明，进程的活跃页表项数量与扫描所需时间呈正相关关系。扫描时间越长，意味着当前系统内存访问负载较高。如果仍然采用固定时间间隔进行扫描，可能会导致不必要的额外开销，尤其是在高负载情况下进一步加剧性能损耗。
 
-![](./result/trace/scan_time/scan_time.png)
+![](./result/track/scan_time/scan_time.png)
 
 在实验中，我们编写了一个测试程序，该程序分配 16GB 内存并进行持续的随机访存，并记录在1s内的访存次数，以此来评估启用内核模块进行后台页表扫描对系统性能的影响。实验中设置了不同的扫描间隔，分别为 1000ms、2000ms、4000ms 和 6000ms，旨在观察不同扫描频率下对访存性能的影响。
 
@@ -78,7 +124,7 @@ Hemem PEBS 虚拟化不合适
 
 通过这种测试，我们可以看出，启用后台页表扫描会影响程序的访存效率，尤其是在高频扫描的情况下。随着扫描频率的增加，系统资源被更多地分配给页表扫描过程，导致正常的内存访问延迟增加，最终影响整体性能。因此，在设计内存管理和页表扫描策略时，需要平衡性能需求和扫描频率，以避免过度干扰系统的正常运行。
 
-![](./result/trace/pt_scan_impact/memory_accesses.png)
+![](./result/track/pt_scan_impact/memory_accesses.png)
 
 我们提出了一种动态调整扫描间隔的方法，使其能够根据实际的内存访问活跃程度进行自适应调整。
 
@@ -103,17 +149,29 @@ overhead 测试了 500 1000 2000 4000
 
 2000+ 
 
-![](./result/trace/overhead/overhead.png)
+![](./result/track/overhead/overhead.png)
 
-优化的页表树扫描， linux内核四级/五级页表，telescope 只对于 DAMON 采样做了优化，walk_page_vma walk_page_vma_opt 如果上级页表项没有A直接返回，在benchmark中最多提升缩小近一半的扫描范围
+优化的页表树扫描：在 Linux 内核中，针对进程页面的遍历通常使用 walk_page_vma 进行单个 VMA（虚拟内存区域）的页表遍历，而 walk_page_range 可以用于访问整个进程的地址空间。然而，传统的页表扫描方法存在性能瓶颈，特别是在大规模进程内存管理时。Linux 采用 四级/五级页表 结构进行地址翻译，页表访问的层次包括：PGD（Page Global Directory）PUD（Page Upper Directory）PMD（Page Middle Directory）PTE（Page Table Entry）（P4D，部分体系结构使用五级页表）
 
-![](./result/trace/pt_scan/pt_scan_redis_bar.png)
+在进行一次完整的地址翻译时，硬件会依次访问每一层的页表项，并且 每一级的页表项都会被设置 ACCESS 位。这意味着如果某个 PTE 级别的页表项被访问，那么它的所有上级页表节点（PMD/PUD/PGD）的 ACCESS 位也会被置位。
+
+基于这一观察，我们可以优化页表扫描的范围：
+
+逐层检查 ACCESS 位：如果一个 父页表节点（PGD/PUD/PMD） 的 ACCESS 位未被设置，则可以直接跳过其所有子节点的扫描，因为它们必然未被访问。
+
+减少不必要的 PTE 级别扫描：传统 walk_page_range 可能会访问整个进程的地址空间，而在许多情况下，未被访问的页表区域无需遍历。
+
+借鉴 telescope 设计思路：telescope 通过优化 DAMON（Data Access Monitoring）采样来提高访存监控效率，我们借鉴其思想，优化页表扫描逻辑，使其适用于 更普适的页表扫描场景，不仅限于 DAMON 采样。
+
+![](./result/track/pt_scan/pt_scan_redis_bar.png)
 
 redis xsbench pr 都是访存比较密集的应用， graph500 的提升特别明显， 因为 Graph500 主要用于评测大规模图处理的性能，它的核心算法是 BFS（Breadth-First Search，广度优先搜索），Graph500 需要遍历大型图的数据结构（通常是邻接表或压缩格式存储），访问模式呈非连续、非局部特性, 这导致其访存模式是高度稀疏的
 
 opt 的扫描模式会去除掉根节点的访问，大幅缩小扫描范围
 
-![](./result/trace/pt_scan/pt_scan_opt_all.png)
+![](./result/track/pt_scan/pt_scan_opt_all.png)
+
+### page migration
 
 ## conclusion and future work
 
