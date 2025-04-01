@@ -10,11 +10,14 @@
 #include <sys/mman.h>
 #include <time.h>
 #include <unistd.h>
+#include <stdbool.h>
 
-#define SIZE_MB    2048u   // Allocate 2048MB (2GB) memory
+#define SIZE_MB    2048l   // Allocate 2048MB (2GB) memory
 #define PAGE_SIZE  4096    // Page size: 4KB
 #define ACCESS_CNT 10000  // Number of memory accesses per iteration
 #define ITER_CNT   500
+
+int r_ratio;
 
 void bind_cpu_to_node(int cpu_node) {
     cpu_set_t mask;
@@ -147,10 +150,15 @@ void touch_memory(void *mem, size_t size) {
     printf("Starting random memory access to observe NUMA migration\n");
     static int count = 1;
     while (count < ITER_CNT) {
-        for (size_t i = 0; i < 100000; i++) {
+        for (size_t i = 0; i < ACCESS_CNT; i++) {
             // Generate a random page index
             size_t rand_page = rand() % num_pages;
-            arr[rand_page * PAGE_SIZE] += 1;  // Access the page
+            bool r = (rand() % 100) < r_ratio;
+            if (!r) {
+                arr[rand_page * PAGE_SIZE] += 1;  // Access the page
+            } else {
+                volatile int x = arr[rand_page * PAGE_SIZE];
+            }
         }
 
         // Print NUMA page distribution every 10 iterations
@@ -166,13 +174,14 @@ void touch_memory(void *mem, size_t size) {
 }
 
 int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <CPU_NODE> <MEM_NODE>\n", argv[0]);
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <CPU_NODE> <MEM_NODE> <R_RATIO>\n", argv[0]);
         exit(1);
     }
 
     int cpu_node = atoi(argv[1]);
     int mem_node = atoi(argv[2]);
+    r_ratio = atoi(argv[3]);
     size_t size = SIZE_MB * 1024 * 1024;
 
     bind_cpu_to_node(cpu_node);

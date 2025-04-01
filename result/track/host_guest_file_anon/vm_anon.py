@@ -37,14 +37,16 @@ plt.figure(figsize=(10, 6))
 linewidth = 2.5
 
 # 绘制宿主机数据并在每条线上均匀添加标记
-plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#ff1900", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
-plt.plot(x, host_file_pages_list, label="Host VM File", color="#ff8080", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_anon_pages_list, label="Guest Anon", color="#0000ff", linewidth=linewidth, marker='^', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_file_pages_list, label="Guest File", color="#7f7fff", linewidth=linewidth, marker='D', markersize=5, markevery=len(x)//10)
+# 绘制宿主机数据并在每条线上均匀添加标记
+plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#ff0000", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
+plt.plot(x, host_file_pages_list, label="Host VM File", color="#ff0000", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
+plt.plot(x, guest_anon_pages_list, label="Guest VM Anon", color="#0000ff", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
+plt.plot(x, guest_file_pages_list, label="Guest VM File", color="#0000ff", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
+
 
 # 添加标题和标签
 plt.xlabel("Time (minutes)", fontsize=20)
-plt.ylabel("Pages (GB)", fontsize=20)
+plt.ylabel("Page Cache(GB)", fontsize=20)
 plt.xticks([])  # 去掉 x 轴刻度
 plt.tick_params(axis="both", direction="in", length=6)
 plt.legend(fontsize=15)

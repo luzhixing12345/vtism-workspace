@@ -130,13 +130,19 @@ clean:
 VTISM_BZIMAGE=/home/lzx/vtism/arch/x86/boot/bzImage
 TPP_BZIMAGE=/home/lzx/Nomad/src/linux-5.13-rc6/arch/x86/boot/bzImage
 NOMAD_BZIMAGE=/home/lzx/Nomad/src/nomad/arch/x86/boot/bzImage
-MEMTIS_BZIMAGE=/home/lzx/memtis/linux/$(X86_KERNEL_PLACE)
+MEMTIS_BZIMAGE=/home/lzx/memtis/linux/arch/x86/boot/bzImage
 # BZIMAGE=$(TPP_BZIMAGE)
 # BZIMAGE=$(BASIC_510_BZIMAGE)
 # BZIMAGE=$(TPP_BZIMAGE)
-# BZIMAGE=$(MEMTIS_BZIMAGE)
-BZIMAGE=/home/lzx/code/linux-6.6/arch/x86/boot/bzImage
+# BZIMAGE=$(NOMAD_BZIMAGE)
+# BZIMAGE=/home/lzx/code/linux-6.6/arch/x86/boot/bzImage
+
 # BZIMAGE=/home/lzx/code/linux-5.4.49/arch/x86/boot/bzImage
+
+k=vtism
+# if k is not set, use default kernel
+BZIMAGE=$(shell ./get_kernel.sh $(k))
+
 vtism:
 	taskset -c 48-55 $(QEMU) \
 	-kernel $(BZIMAGE) \
@@ -230,14 +236,14 @@ vnuma:
 	$(QEMU) -name guest=vm0,debug-threads=off \
     -machine pc \
     -cpu host \
-    -m 128G \
     -enable-kvm \
+    -m 32G \
     -overcommit mem-lock=off \
     -smp 8 \
-    -object memory-backend-ram,size=32G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
-    -object memory-backend-ram,size=32G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
-	-object memory-backend-ram,size=32G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
-    -object memory-backend-ram,size=32G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -object memory-backend-ram,size=8G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=8G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=8G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=8G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
     -numa node,nodeid=0,memdev=m0,cpus=0-3 \
     -numa node,nodeid=1,memdev=m1,cpus=4-7 \
 	-numa node,nodeid=2,memdev=m2 \
@@ -270,8 +276,7 @@ vnuma:
     -device e1000,netdev=ndev.0 \
     -nographic \
 	-kernel $(BZIMAGE) \
-    -append "root=/dev/sda2 console=ttyS0 quiet" \
-	$(SHARED_MEM)
+    -append "root=/dev/sda2 console=ttyS0 quiet"
 
 debug:
 	taskset -c 0-7 $(QEMU) -name guest=vm0 \
@@ -290,13 +295,13 @@ debug:
 debug_numa:
 	taskset -c 0-15 $(QEMU) -name guest=vm0 \
     -machine pc \
-    -m 64G \
+    -m 8G \
     -overcommit mem-lock=off \
     -smp 16 \
-    -object memory-backend-ram,size=16G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
-    -object memory-backend-ram,size=16G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
-	-object memory-backend-ram,size=16G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
-    -object memory-backend-ram,size=16G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
+    -object memory-backend-ram,size=2G,host-nodes=0,policy=bind,prealloc=no,id=m0 \
+    -object memory-backend-ram,size=2G,host-nodes=1,policy=bind,prealloc=no,id=m1 \
+	-object memory-backend-ram,size=2G,host-nodes=2,policy=bind,prealloc=no,id=m2 \
+    -object memory-backend-ram,size=2G,host-nodes=3,policy=bind,prealloc=no,id=m3 \
     -numa node,nodeid=0,memdev=m0,cpus=0-7 \
     -numa node,nodeid=1,memdev=m1,cpus=8-15 \
 	-numa node,nodeid=2,memdev=m2 \
