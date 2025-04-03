@@ -15,4 +15,4 @@ benchmark/spec2017/
 *.txt
 *.log
 /gpt-trace/
-/pcm/
+pcm/

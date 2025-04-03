@@ -1,6 +1,11 @@
 import re
 import matplotlib.pyplot as plt
 
+# 可调整的字体大小
+axis_font_size = 16
+tick_font_size = 16
+legend_font_size = 14
+
 def get_data(file_path):
     with open(file_path, "r") as f:
         content = f.read()
@@ -10,36 +15,38 @@ def get_data(file_path):
     matches = re.findall(pattern, content)
     
     # 将匹配到的 A 和 T 分别提取出来
-    vma = [int(match)/1024  for match in matches]
-    # print(len(A_values))
+    vma = [int(match)/1024 for match in matches]
     
     return vma
 
 def main():
-
-    
     gpt_scan = get_data("vma.txt")
 
     ept_scan = [32 for _ in range(len(gpt_scan))]
+    
     # 绘制曲线
-    plt.plot(ept_scan, label="EPT scan", color="blue")
+    plt.plot(ept_scan, label="HPT scan", color="blue")
     plt.plot(gpt_scan, label="GPT scan", color="red")
 
     # 添加标题和标签
-    # plt.title('Optimized Page Table Scan')
-    plt.xlabel("Time (minute)")
-    plt.ylabel("scan vm (GB)")
+    plt.xlabel("Time (minutes)", fontsize=axis_font_size)
+    plt.ylabel("scan vm size (GB)", fontsize=axis_font_size)
+    
+    # 调整刻度字体大小
+    plt.xticks(fontsize=tick_font_size)
+    plt.yticks(fontsize=tick_font_size)
+
+    # 隐藏 X 轴刻度
     plt.xticks([])
     plt.ylim(0, 40)
     plt.tick_params(axis="both", direction="in")
+
     # 显示图例
-    plt.legend()
-    plt.savefig("gpt-vs-ept.png", dpi=300)
-    # plt.savefig('gpt-vs-ept.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
+    plt.legend(fontsize=legend_font_size)
+    plt.tight_layout()
 
-    # 显示图形
-    # plt.show()
-
+    # 保存图像
+    plt.savefig("gpt-vs-hpt.png", dpi=300)
 
 if __name__ == "__main__":
     main()
