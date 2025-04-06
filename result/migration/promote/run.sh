@@ -19,17 +19,27 @@ if [ "$kernel_name" == "vtism" ]; then
     echo "use vtism migration"
 fi
 
-if [ "$kernel_name" == "nomad" ]; then
-    sudo insmod async_promote.ko
-    echo "insmod async_promote.ko"
-fi
+# if [ "$kernel_name" == "nomad" ]; then
+#     sudo insmod async_promote.ko
+#     echo "insmod async_promote.ko"
+# fi
 
-./numa_promote 0 2 0 > $kernel_name.0.log
-echo "finish 0 r ratio"
-./numa_promote 0 2 30 > $kernel_name.30.log
-echo "finish 30 r ratio"
-./numa_promote 0 2 50 > $kernel_name.50.log
-echo "finish 50 r ratio"
-./numa_promote 0 2 70 > $kernel_name.70.log
-echo "finish 70 r ratio"
+run_program() {
+    r_ratio=$1
+    ./numa_promote 0 2 $r_ratio > $kernel_name.$r_ratio.log
+    echo "finish $1 r ratio"
+}
+
+run_program 0
+# run_program 10
+run_program 20
+# run_program 30
+run_program 40
+# run_program 50
+run_program 60
+# run_program 70
+run_program 80
+# run_program 90
+run_program 100
+
 echo "scp vm:~/$kernel_name.*.log ./"

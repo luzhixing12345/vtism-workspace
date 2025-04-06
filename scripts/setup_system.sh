@@ -41,6 +41,7 @@ setup_tpp() {
 
 setup_nomad() {
     sudo insmod kernel/async_promote.ko
+    echo "insmod async_promote module"
     echo 1 >/sys/kernel/mm/numa/demotion_enabled
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
@@ -89,8 +90,8 @@ system_init() {
 run_mem_stress() {
     echo "---- run mem stress ----"
     # left 10GB free memory for system
-    nohup ./userspace/mem_stress 0 22 > /dev/null 2>&1 & 
-    nohup ./userspace/mem_stress 1 22 > /dev/null 2>&1 & 
+    # nohup ./userspace/mem_stress 0 22 > /dev/null 2>&1 & 
+    # nohup ./userspace/mem_stress 1 22 > /dev/null 2>&1 &
 }
 
 system_init

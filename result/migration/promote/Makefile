@@ -1,14 +1,24 @@
+# Compiler settings
+CC = gcc
+# CFLAGS = -O3 -Wall
+LDFLAGS = -lnuma -lpthread
 
-LDFLAG = -lnuma
+# Target settings (default if not specified)
+TARGET ?= numa_promote multi_numa_promote
 
-all: numa_promote
+# Build both .o and executable by default
+all: $(TARGET).o $(TARGET)
 
-numa_promote: numa_promote.o
-	$(CC) -o $@ $< $(LDFLAG)
+# Rule for building object files
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-numa_promote.o: numa_promote.c
-	$(CC) -c $<
+# Rule for building executables
+%: %.o
+	$(CC) $< -o $@ $(LDFLAGS)
 
-
+# Clean rule
 clean:
-	rm -f *.o numa_promote
+	rm -f *.o $(TARGET) $(TARGET).o
+
+.PHONY: all clean
