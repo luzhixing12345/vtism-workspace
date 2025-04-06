@@ -10,8 +10,8 @@ def parse_log_file(file_path):
     
     matches = re.findall(r'Traversal completed in (\d+\.\d+) seconds.', content)
     values = [float(m) for m in matches]
-    slow_down = (values[1] ) / values[0]
-    return slow_down
+    slow_down = (values[1] -values[0]) / values[0]
+    return int(slow_down * 100)
 
 def main():
     log_dir = "."  # 日志所在目录，当前目录
@@ -34,8 +34,8 @@ def main():
     plt.plot(memory_sizes, avg_accesses, marker='o', linestyle='-', linewidth=2.5, markersize=5, color='blue')
     
     # 设置轴标签和标题
-    plt.xlabel("Memory Size (GB)", fontsize=18)
-    plt.ylabel("Avg Max Memory Accesses (per sec)", fontsize=18)
+    plt.xlabel("Scaned Workload Memory Size (GB)", fontsize=18)
+    plt.ylabel("Runtime slow down(%)", fontsize=18)
     plt.xticks(fontsize=15)
     plt.yticks(fontsize=15)
     plt.grid(True, linestyle="--", alpha=0.6)

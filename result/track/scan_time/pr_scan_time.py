@@ -53,4 +53,4 @@ plt.xticks([], fontsize=TICK_SIZE)
 plt.tight_layout()
 
 # 保存图像
-plt.savefig('scan_time.png', dpi=300)
+plt.savefig('pr_scan_time.png', dpi=300)
