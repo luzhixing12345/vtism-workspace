@@ -8,7 +8,7 @@
 
 #define PAGE_SIZE 4096
 #define M         300     // 轮数
-#define SLEEP_US  100000  // 每轮休眠100ms
+#define SLEEP_US  10000  // 每轮休眠100ms
 
 static inline uint64_t get_time_ns() {
     struct timespec ts;
@@ -38,9 +38,9 @@ int main(int argc, char *argv[]) {
     uint64_t start_time = get_time_ns();
 
     for (int round = 0; round < M; ++round) {
-        if (round % 100 == 0) {
-            fprintf(stderr, "time = %.2f\n", (get_time_ns() - start_time) / 1e9);
-        }
+        // if (round % 100 == 0) {
+        //     fprintf(stderr, "time = %.2f\n", (get_time_ns() - start_time) / 1e9);
+        // }
         for (size_t i = 0; i < num_pages; ++i) {
             memory[i * PAGE_SIZE] += 1;
         }
