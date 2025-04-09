@@ -1,7 +1,5 @@
 # Compiler settings
 CC = gcc
-CFLAGS = -O3 -Wall
-LDFLAGS = -lnuma
 
 # Target settings (default if not specified)
 TARGET ?= mem_access
