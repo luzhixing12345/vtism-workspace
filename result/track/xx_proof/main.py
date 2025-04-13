@@ -15,7 +15,7 @@ def parse_log_file(file_path):
     return None
 
 def main():
-    intervals = ['1000', '2000', '4000', '6000']
+    intervals = ['1000','1500', '2000', '2500']
     file_range = range(1, 25)
     colors = ["#3851a3", "#72aacc", "#fdba6c", "#eb5d3b"]  # 不同间隔对应颜色
 

@@ -1,71 +1,74 @@
 import matplotlib.pyplot as plt
-import numpy as np
+import re
 
-# 字体大小配置
-LABEL_FONT_SIZE = 14
-TICK_FONT_SIZE = 16
-LEGEND_FONT_SIZE = 14
-TITLE_FONT_SIZE = 16
-AXIS_LABEL_FONT_SIZE = 16
+# 样式配置
+bar_color = "blue"
+bar_width = 0.4
+figsize = (10, 6)
+dpi = 300
 
-def main():
-    # 数据
-    graph500 = {0: 208.98, 500: 210.78, 1000: 209.99, 2000: 209.82, 4000: 209.6}
-    pr = {0: 195.50, 500: 202.93, 1000: 200.65, 2000: 199.4, 4000: 198}
-    xsbench = {0: 96.42, 500: 99.06, 1000: 98.9, 2000: 98.19, 4000: 97.5}
-    redis = {0: 211.40, 500: 224.64, 1000: 222.28, 2000: 218.99, 4000: 216.12}
+font_size_label = 22
+font_size_ticks = 22
 
-    time_points = [500, 1000, 2000, 4000]
-    data = [graph500, pr, xsbench, redis]
-    benchmarks = ["graph500", "pr", "xsbench", "redis"]
+# 预定义的 benchmark 名称
+benchmarks = ["redis", "pr", "graph500", "liblinear", "XSBench", "gups"]
+benchmark_times = {name: [] for name in benchmarks}
 
-    # 计算 overhead
-    overhead_data = []
-    for benchmark_data in data:
-        base = benchmark_data[0]
-        overhead = {t: (benchmark_data[t] - base) / base * 100 if base != 0 else 0 for t in time_points}
-        overhead_data.append(overhead)
+# 读取日志内容并按块分组
+with open("vtism-benchmark.log", "r") as f:
+    lines = f.readlines()
 
-    # 设置绘图参数
-    x = np.arange(len(benchmarks))  # 每组柱子的 x 坐标
-    width = 0.2  # 每个柱子的宽度
-    offsets = [-1.5, -0.5, 0.5, 1.5]  # 4 个时间点的偏移量
+# 每 3 行构成一个运行块：[benchmark], cmd, time
+for i in range(0, len(lines), 3):
+    if i + 2 >= len(lines):
+        continue
+    cmd_line = lines[i + 1].strip()
+    time_line = lines[i + 2].strip()
 
-    fig, ax = plt.subplots(figsize=(10, 6))
-    colors = ["#ccccf2", "#9999e5", "#6666d8", "#3333cb"]
+    # 提取 benchmark 名
+    matched = None
+    for name in benchmarks:
+        if name in cmd_line:
+            matched = name
+            break
+    if not matched:
+        continue
 
-    # 依次绘制不同时间点的 overhead 数据
-    for i, time in enumerate(time_points):
-        heights = [d[time] for d in overhead_data]
-        ax.bar(
-            x + offsets[i] * width,
-            heights,
-            width,
-            label=f"{time} ms",
-            color=colors[i],
-            linewidth=0.5,
-            edgecolor="black",
-        )
+    # 提取时间
+    match = re.search(r'time:\s*([\d.]+)', time_line)
+    if match:
+        t = float(match.group(1))
+        benchmark_times[matched].append(t)
+        print(f"matched {matched}")
 
-    # 设置标题和轴标签
-    ax.set_ylabel("Overhead (%)", fontsize=AXIS_LABEL_FONT_SIZE)
-    ax.set_xticks(x)
-    ax.set_xticklabels(benchmarks, fontsize=TICK_FONT_SIZE)
-    ax.tick_params(axis="both", labelsize=TICK_FONT_SIZE, direction="in")
-    ax.legend(title="scan base interval", fontsize=LEGEND_FONT_SIZE, title_fontsize=LABEL_FONT_SIZE)
+# 计算 Overhead（第二次 - 第一次）/ 第一次 * 100
+overheads = []
+for name in benchmarks:
+    times = benchmark_times[name]
+    if len(times) >= 2:
+        base, second = times[:2]
+        if second < base:
+            print(name, 'second < base')
+        overhead = (second - base) / base * 100
+        overheads.append(overhead)
+    else:
+        overheads.append(0)
 
-    # 纵轴 5 的位置画一条横线
-    ax.axhline(5, color="black", linestyle="--", linewidth=0.5)
-    
-    # y 轴范围 0-10
-    ax.set_ylim(0, 10)
+# 画图
+fig, ax = plt.subplots(figsize=figsize)
+ax.bar(benchmarks, overheads, color=bar_color, edgecolor='black', width=bar_width)
 
-    # 显示图形
-    plt.tight_layout()
-    plt.savefig("overhead.pdf", dpi=300)
-    plt.savefig("overhead.png", dpi=300)
-    # plt.show()
+ax.set_ylabel("Overhead (%)", fontsize=font_size_label)
+ax.set_ylim(0, 8)
+ax.set_yticks([0, 2, 4, 5, 6, 8])
+ax.axhline(y=5, color='black', linestyle='--', linewidth=2)
 
+ax.set_xticks(range(len(benchmarks)))
+ax.set_xticklabels(benchmarks, fontsize=font_size_ticks)
+ax.tick_params(axis='y', labelsize=font_size_ticks)
 
-if __name__ == "__main__":
-    main()
+ax.grid(axis='y', linestyle='--', alpha=0.5)
+
+plt.tight_layout()
+plt.savefig("benchmark_overhead.png", dpi=dpi)
+# plt.show()

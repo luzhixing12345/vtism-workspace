@@ -37,9 +37,9 @@ for i in range(1, len(segments), 2):
         print(f"Warning: Interval {interval} does not contain enough time entries.")
 
 # 绘制柱状图
-plt.figure(figsize=(4, 6))
+plt.figure(figsize=(10, 6))
 x = range(len(intervals))
-bars = plt.bar(x, overheads, color=bar_color, edgecolor=bar_edge)
+bars = plt.bar(x, overheads, color=bar_color, edgecolor=bar_edge, width=0.4)
 plt.axhline(y=5, color='grey', linestyle='--', linewidth=2)
 # 设置x轴刻度
 plt.xticks(x, intervals, fontsize=font_size)

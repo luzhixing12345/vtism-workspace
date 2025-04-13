@@ -4,7 +4,7 @@
 sudo dmesg -C
 rm -f *.log
 
-for interval in 1000 2000 4000 6000
+for interval in 1000 1500 2000 2500
 do
     echo "--------interval=${interval}------------"
     for i in {1..24}

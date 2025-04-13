@@ -36,7 +36,7 @@ ax1.set_xlabel('Time(minutes)', fontsize=LABEL_SIZE)
 ax1.set_ylabel('Scanned PTE items', fontsize=LABEL_SIZE)
 ax1.plot(range(len(page_values)), page_values, color='blue', label='Scanned PTE items')
 ax1.tick_params(axis='y', labelsize=TICK_SIZE)
-
+ax1.tick_params(axis="both", direction="in", length=6)
 # 绘制时间的折线
 ax2 = ax1.twinx()
 ax2.set_ylabel('Scan Time (ms)', fontsize=LABEL_SIZE)
@@ -48,9 +48,9 @@ fig.legend(loc='upper right', bbox_to_anchor=(0.90, 0.92), ncol=1, fontsize=LEGE
 
 # 隐藏 x 轴刻度
 plt.xticks([], fontsize=TICK_SIZE)
-
 # 调整图形布局
 plt.tight_layout()
+plt.tick_params(axis="both", direction="in", length=6)
 
 # 保存图像
 plt.savefig('pr_scan_time.png', dpi=300)

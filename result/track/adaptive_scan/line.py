@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 # 样式参数
 line_colors = ['red', 'orange', 'green', 'blue']
 font_size = 16
-figsize = (12, 6)
+figsize = (10, 6)
 dpi = 300
 
 intervals = ['7', '8', '8+50', '9']

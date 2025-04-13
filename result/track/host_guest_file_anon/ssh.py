@@ -74,10 +74,12 @@ def main():
         stdin, stdout, stderr = ssh.exec_command(guest_file_cmd)
         guest_file_pages = parse_num(stdout.read().decode())
         guest_file_pages_list.append(guest_file_pages)
+        
 
         count += 1
         if count % 200 == 0:
             print(f"count: {count}")
+            print()
 
     # save as json
     data = {
@@ -87,8 +89,8 @@ def main():
         "guest_file_pages_list": guest_file_pages_list,
     }
 
-    with open("data.json", "w") as f:
-        json.dump(data, f)
+    # with open("data.json", "w") as f:
+    #     json.dump(data, f)
 
 
 if __name__ == "__main__":

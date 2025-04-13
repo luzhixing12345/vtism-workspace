@@ -24,6 +24,7 @@ def main():
 
     ept_scan = [32 for _ in range(len(gpt_scan))]
     
+    plt.figure(figsize=(10, 6))
     # 绘制曲线
     plt.plot(ept_scan, label="HPT scan", color="blue")
     plt.plot(gpt_scan, label="GPT scan", color="red")

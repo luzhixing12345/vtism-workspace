@@ -34,7 +34,7 @@ def plot_avg_scan_time(avg_times):
     ax.plot(memory_sizes, avg_latencies, marker='o', linestyle='-', color=line_color,
              linewidth=line_width, markersize=marker_size, label="Scan Time")
 
-    plt.xlabel("Workload Memory Size (GB)", fontsize=axis_fontsize)
+    plt.xlabel("Active Workload Memory Size (GB)", fontsize=axis_fontsize)
     plt.ylabel("Average Scan Time (ms)", fontsize=axis_fontsize)
     # plt.title("Average Scan Time vs Memory Size", fontsize=title_fontsize)
     plt.xticks(memory_sizes, fontsize=tick_font_size)
@@ -56,6 +56,7 @@ def plot_avg_scan_time(avg_times):
     plt.grid(True, linestyle='--', alpha=0.5)
     # plt.legend(fontsize=16)
     plt.tight_layout()
+    plt.tick_params(axis="both", direction="in", length=6)
     plt.savefig("scan_time.png", dpi=300)
     plt.show()
 

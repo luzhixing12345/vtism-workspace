@@ -28,6 +28,12 @@ elif [ $benchmark == "pr" ]; then
 elif [ $benchmark == "xsbench" ]; then
     echo "run xsbench benchmark"
     ./scripts/run/xsbench.sh
+elif [ $benchmark == "gups" ]; then
+    echo "run gups benchmark"
+    ./scripts/run/gups.sh
+elif [ $benchmark == "liblinear" ]; then
+    echo "run liblinear benchmark"
+    ./scripts/run/liblinear.sh
 else
     echo "unknown benchmark"
 fi

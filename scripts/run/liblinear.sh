@@ -29,7 +29,7 @@ run_liblinear() {
     done
     real_time=$(awk '/real/ {print $2}' /tmp/backend_time.log)
     exe_name=$(basename $liblinear_exe)
-    echo "[$exe_name]: ${real_time}" >> "$LOG_FILE"
+    echo -e "[benchmark]\ncmd:$exe_name $liblinear_args\ntime: $real_time" >> "$LOG_FILE"
     rm -f /tmp/backend_time.log
     flush_cache
 }
