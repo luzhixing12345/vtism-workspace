@@ -7,7 +7,7 @@ declare -A available_kernel_setups=(
     ["5.15.19-htmm"]="setup_htmm"       # 你可以在这里添加相应的函数
     ["5.3.0-autotiering"]="setup_autotiering"
     ["5.6.0-rc6nimble+"]="setup_nimble"
-    ["6.6.0autonuma+"]="setup_autonuma"
+    ["5.13.1autonuma"]="setup_autonuma"
     ["6.6.0vtism+"]="setup_vtism"
 )
 
@@ -90,8 +90,8 @@ system_init() {
 run_mem_stress() {
     echo "---- run mem stress ----"
     # left 10GB free memory for system
-    # nohup ./userspace/mem_stress 0 22 > /dev/null 2>&1 & 
-    # nohup ./userspace/mem_stress 1 22 > /dev/null 2>&1 &
+    nohup ./userspace/mem_stress 0 24 > /dev/null 2>&1 & 
+    nohup ./userspace/mem_stress 1 24 > /dev/null 2>&1 &
 }
 
 system_init

@@ -9,13 +9,22 @@ fi
 # Define the directory where the kernel images are stored
 KERNEL_DIR="/boot"
 
+# Get the current running kernel version
+CURRENT_KERNEL=$(uname -r)
+
 # List available kernel versions and assign a number to each
 echo "Available kernel versions:"
 kernels=($(ls ${KERNEL_DIR}/vmlinuz-*))
 count=0
 for kernel in "${kernels[@]}"; do
-    kernel_version=$(echo $kernel | sed 's/.*\/vmlinuz-//')
-    echo "[$count]: $kernel_version"
+    kernel_version=$(basename "$kernel" | sed 's/vmlinuz-//')
+
+    if [[ "$kernel_version" == "$CURRENT_KERNEL" ]]; then
+        # 白色加粗 + 箭头标识当前内核
+        printf "[%d]: \e[1;37m%s ← (current)\e[0m\n" "$count" "$kernel_version"
+    else
+        echo "[$count]: $kernel_version"
+    fi
     ((count++))
 done
 echo ""
@@ -50,6 +59,6 @@ KID="${KID//\'/}"
 sed -i "s/GRUB_DEFAULT=.*/GRUB_DEFAULT=\"$MID>$KID\"/" /etc/default/grub
 update-grub
 
-echo -e "\e[32;1mLinux kernel is now $kernel_version, Please reboot machine\e[0m"
+echo -e "Linux kernel is now [\e[32;1m$kernel_version\e[0m], Please reboot machine"
 
 echo -e "\e[1m  sudo reboot\e[0m"

@@ -43,7 +43,7 @@
 
 key insight
 
-### 2.1 虚拟化中的语义隔阂
+### 2.1 虚拟化的语义隔阂
 
 虚拟化环境中，宿主机由于存在虚拟机管理器（VMM）这一中间抽象层，无法直接感知 Guest 虚拟机中实际运行的应用负载及其内存使用行为。这种“语义隔阂”严重制约了宿主机对内存管理策略的精细化调度能力，特别体现在页面追踪与页面分类等核心任务上。
 
@@ -59,9 +59,11 @@ key insight
 
 Linux 内核对文件页(File-backed Pages) 和 匿名页(Anonymous Pages) 采用 不同的回收策略:文件页 由于有后备存储(如磁盘),通常 更容易被回收,策略也 更激进;匿名页(如应用程序的堆、栈)没有后备存储,回收时需要进行 交换(Swap-out),因此回收更为 保守.
 
-虚拟化环境中的语义隔阂显著限制了宿主机对虚拟机内存使用行为的精准理解与管理，尤其在页面追踪与页面分类方面暴露出识别范围不准、页面类型误判等问题。要有效提升内存资源的使用效率，需要建立 Guest OS 与宿主机之间的协同机制，打破虚拟化带来的语义隔阂。
+虚拟化环境中的语义隔阂显著限制了宿主机对虚拟机内存使用行为的精准理解与管理，尤其在页面追踪与页面分类方面暴露出识别范围不准、页面类型误判等问题，导致回收策略准确性不足。要有效提升内存资源的使用效率，需要建立 Guest OS 与宿主机之间的协同机制，打破虚拟化带来的语义隔阂。
 
-### 2.2 页表扫描间隔与工作负载
+### 2.2 页表扫描间隔与活跃工作负载
+
+<!-- vtmm 1min, Thermostat 30s -->
 
 传统的页表扫描策略通常采用固定的扫描间隔，该间隔通过在不同 benchmark 负载下测试系统性能开销来设定，通常以确保在引入后台页表扫描模块后，前台进程的性能损失不超过 5% 为原则。我们认为这种固定间隔扫描方式存在显著的局限性，不同虚拟机实例所承载的应用具有高度异质的内存访问模式与工作集动态行为，其访存活跃程度与工作负载强度差异显著，单一固定扫描间隔难以同时兼顾不同类型的虚拟机应用。对于内存活跃度较低的轻量级应用，可能因扫描频率过低而错失关键页面冷热状态的变化，影响内存分层策略的准确性；而对于工作集频繁变化的高负载应用，则扫描频率过高会引入不必要的开销
 
@@ -81,64 +83,64 @@ Linux 内核对文件页(File-backed Pages) 和 匿名页(Anonymous Pages) 采�
 
 ![](./result/track/xx_proof/multi_interval_slowdown.png)
 
-在更大的活跃工作集下，页表扫描需遍历的页表项数量显著增加，导致单轮扫描时间增长。而扫描过程中的一系列操作——包括访问页表结构、修改页表项中的 A/D 位以及刷新对应的 TLB 项——对系统性能的影响并非线性叠加。
+在更大的活跃工作集下，页表扫描需遍历的页表项数量显著增加，导致单轮扫描时间增长。而扫描过程中的一系列操作——包括访问页表结构、修改页表项中的 A/D 位以及刷新对应的 TLB 项——对系统性能的影响并非线性叠加。修改 A/D 位需持有页表项对应的 spinlock，而大范围的 TLB 刷新会破坏处理器高速缓存一致性，从而加剧前台程序的访存延迟。这些因素共同作用，导致页表扫描对进程执行时间的影响随工作负载扩大而非线性放大。
 
-其中，修改 A/D 位需持有页表项对应的 spinlock，而大范围的 TLB 刷新会破坏处理器高速缓存一致性，从而加剧前台程序的访存延迟。这些因素共同作用，导致页表扫描对进程执行时间的影响随工作负载扩大而非线性放大。其中我们注意到
+我们观察到，当页表扫描间隔设置为1000ms和2000ms时，程序运行时间的减速比分别在活跃工作集达到约8GB和16GB后趋于饱和，最终稳定在约5倍的减速上限，这一现象的根本原因在于页表扫描的周期性执行机制与程序内存访问模式之间的相互作用。
 
-通过实验我们得到两个结论(1) 系统的活跃内存访问负载越高, 扫描时间越长，二者成正比关系 (2) 扫描时间非线性影响程序访存性能。因此需要根据实时工作负载情况动态平衡性能需求和扫描频率，如果仍然采用固定时间间隔进行扫描,可能难以适应不同规模工作集的性能敏感性，需引入更为灵活的扫描间隔控制策略以缓解性能开销
+在较短的扫描间隔（如1000ms）下，即使其总分配并访问内存较大（如10GB），程序在两次扫描之间的时间窗口内也仅能访问部分活跃页面（如8GB），而随后的页表扫描会重置这些页面的 A/D位，导致扫描范围被限制在该时间窗口内可访问的页面范围内。类似地，当扫描间隔延长至2000ms时，程序可访问的页面范围扩大至约16GB，但超出该范围的工作集不会进一步增加扫描开销，因为后续扫描仍仅覆盖该时间窗口内被触及的页面。因此，当活跃工作集超过扫描间隔所对应的最大可访问内存量时，页表扫描引入的性能干扰不再随工作集增大而显著增加，从而使得减速比趋于稳定。
+
+通过实验我们得到两个结论(1) 系统的活跃内存访问负载越高, 扫描时间越长，二者成正相关 (2) 扫描时间非线性影响程序访存性能。因此需要根据实时工作负载情况动态平衡性能需求和扫描频率，如果仍然采用固定时间间隔进行扫描,可能难以适应不同规模工作集的性能敏感性，需引入更为灵活的扫描间隔控制策略以缓解性能开销
 
 ## 3 vtism design and implementation
 
 ### 3.1 overview
 
-VTISM(Virtualization-aware, NUMA-optimized Tiered Memory System) 是一个专为 虚拟化环境 设计的 分层内存管理系统,它结合 Hypervisor 技术、NUMA 亲和性优化 和 异构内存管理(DRAM + CXL),以 最小化虚拟化开销,实现 高效的页面管理和迁移策略.
+vtism 是一个专为 虚拟化环境 设计的 分层内存管理系统, 它遵循页面跟踪、分类和迁移的经典流程，但在每个环节都引入了创新性设计，充分利用 硬件虚拟化特性(如 EPT)和 软件优化(MGLRU), 通过减少 Guest OS 与 Host OS 之间的内存管理语义隔阂,优化 跨 NUMA 低延迟的页面提升(Promotion)与降级(Demotion),确保充分发挥虚拟机在分层内存系统上的性能潜力
 
-VTISM 充分利用 硬件虚拟化特性(如 Intel PML(Page Modification Logging)、EPT(Extended Page Tables))和 软件优化(如 自适应 Guest 页表扫描、增强版 MGLRU(Multi-Generational LRU)页面温度追踪),以 减少 Guest OS 与 Host OS 之间的内存管理语义隔阂,优化 跨 NUMA 低延迟的页面提升(Promotion)与降级(Demotion),确保充分发挥虚拟机在分层内存系统上的性能潜力
+vtism 包含三大核心模块
 
-VTISM 包含三大核心模块
+Adaptive Optimized Guest Page tracking：在虚拟机内部追踪其内存访问模式, 并根据活跃负载动态调整扫描频率, 优化 A/D 扫描范围,使用共享内存向宿主机内核暴露guest os进程级工作负载信息.
 
-Adaptive Optimized Guest Page tracking.goal: 以最小的Hypervisor开销追踪虚拟机的内存访问模式,根据虚拟机负载情况动态调整扫描频率,在guest os内部进行页面扫描,对操作系统进程页表进行A/D扫描优化,以最小化扫描开销,提高扫描效率.
+MGLRU增强的页面温度分类器（MGLRU-Enhanced Page Temperature Classifier）: 使用 guest 侧的页面访问信息代替 MGLRU 在 host 侧的主动扫描，结合Guest侧页面访问次数和页面类型的提示和Host侧的观测, 形成对不同页面类型更精准的冷热分类, 主动推动 MGLRU 迭代提高页面提升和页面回收决策精准度.
 
-MGLRU增强的页面温度分类器:goal:结合Guest OS的提示和Host侧的观测,提升冷/热页面分类精度,优化内存分配策略.通过guest页表扫描获取精确页面访问信息,使用共享内存向宿主机内核暴露guest os进程级工作负载信息, Host侧的MGLRU算法整合 Guest 访存语义,PML 访问日志和NUMA局部性,形成更精准的冷热页面分类,提高 回收决策精准度.热页面(高访问频率)优先存入 DRAM,以降低访问延迟.冷页面(低访问频率)迁移到 CXL-DRAM,最大化异构内存的容量优势.
-
-NUMA优化的异步页面迁移器: 目标:在保持NUMA亲和性的前提下最小化迁移延迟.将迁移任务调度到目标虚拟机vCPU所在的NUMA节点.根据NUMA链路延迟带宽负载动态调整迁移方向
+NUMA优化的异步页面迁移器（NUMA-Aware Asynchronous Page Migrator）: 在每个 NUMA 节点分别维护一对页面提升与降级队列，根据迁移类型的源节点和目标节点将迁移任务调度到最佳节点，在保持NUMA亲和性的前提下最小化迁移延迟. 并根据 NUMA 链路延迟实时调整迁移方向，迁移后主动修改扩展页表 （EPT）的新映射，以避免 EPT 页面错误导致的 VMTraps
 
 ### 3.2 Adaptive Optimized Guest Page tracking
 
 #### 3.2.1 guest page table tracking
 
-页表扫描的核心目标是检测进程的内存访问行为,这通常通过在两次扫描之间检查页表项的 ACCESS/DIRTY 位(A/D 位)是否被置 1 来实现.具体而言,扫描过程中记录哪些页表项被访问,并在确认访问后清除 A/D 位,同时刷新对应的 TLB 中的缓存项.这一机制不可避免地会引入额外的开销,主要体现在增加访存延迟和影响程序性能.
+2.1 节提到虚拟化环境存在语义隔阂，由于 VMM 抽象层，宿主机无法直接感知 Guest 虚拟机中实际运行的应用负载及其内存使用行为, 主要表现在 (1) 宿主机没有能力跨越 VMM 中间层感知 guest VM 上实际运行的工作负载大小.因此宿主机需要扫描整个 VM 的 全部映射内存以判断页面访问情况,导致扫描时间过长 (2) host 会将 VM 的所有页面视为匿名页，无法跨越 VMM 感知 Guest OS 内核中的真实的页缓存类型，导致页面回收策略准确性不足
 
-在虚拟化环境下在宿主机中传统的页表扫描会带来额外的开销,主要是因为 (1) 宿主机没有能力跨越 VMM 中间层感知 guest VM 上实际运行的工作负载大小.因此宿主机需要扫描整个 VM 的 全部映射内存以判断页面访问情况,导致扫描时间过长 (2)VMM 采用 两级地址转换(EPT/NPT),即 Guest 虚拟地址(GVA)→ Guest 物理地址(GPA)→ Host 物理地址(HPA),重新设置 A/D 位和刷新 TLB 会显著降低 guest os 内存访问速度,带来昂贵的访存开销
+在虚拟化环境下在宿主机中传统的页表扫描会带来额外的开销，现代 VMM 通常采用硬件虚拟化的两级地址转换(EPT/NPT),即 Guest 虚拟地址(GVA)→ Guest 物理地址(GPA)→ Host 物理地址(HPA), 重新设置 A/D 位和刷新 TLB 会显著降低 guest os 内存访问速度,带来昂贵的访存开销
 
-VTISM 采用 Guest Page Table(GPT)扫描,在 Guest OS 内部嵌入一个内核扫描模块,替代传统的宿主机 HPT(Host Page Table)扫描方式.在 guest os 中嵌入内核模块扫描页表的好处在于 Guest OS 具备对自身进程的完整感知能力,可以精准扫描实际使用的内存页,而无需扫描整个 VM 的全部映射内存.
+vtism 采用 Guest Page Table(GPT)扫描,在 Guest OS 内部嵌入一个内核扫描模块,替代传统的宿主机 HPT(Host Page Table)扫描方式. 因为 Guest OS 具备对自身进程的完整感知能力,可以精准扫描实际使用的内存页,而无需扫描整个 VM 的全部映射内存.
 
-#### 3.2.2 Adaptive scan interval
+#### 3.2.2 Shared Memory
 
-vtism 提出了一种动态调整扫描间隔的方法,使其能够根据实际的内存访问活跃程度进行自适应调整.
+在虚拟机创建阶段，vtism 利用 Inter-VM Shared Memory（ivshmem） 设备机制，在 Host 与 Guest 之间建立一段高速、零拷贝的共享内存区域。该共享内存通过 PCI BAR 映射方式呈现在 Guest 内核空间，并由 Host 内核以共享内存的形式接收。
 
-具体地,我们通过如下公式来计算扫描间隔 T_interval:
+在 Guest 内部，vtism 实现了一个专用的字符设备驱动 ivshmem_dev，用于管理该共享内存区域的读写。该驱动负责将 Guest 页表扫描模块收集到的进程级访问模式与页面热度信息结构化后，直接写入映射到共享内存的物理地址空间。写入行为无需系统调用上下文切换或中断通知，极大降低了信息同步的延迟和开销。Host 侧内核模块则通过固定的虚拟地址访问该共享内存区域，并以零拷贝方式解析 Guest 提供的页表扫描数据
+
+对于一个 32GB 的 VM，以 4KB 分割页面，每个页表项需要 8 bytes size 记录，共需要 64MB 共享内存区域。VM 容量和共享内存区域的大小比为 512:1. 我们在共享内存开头写入控制信息，包括扫描轮次，页表项条目数，扫描间隔，以便 host 和 guest 同步。
+
+#### 3.2.3 Adaptive scan interval
+
+vtism 提出了一种动态自适应间隔的页表扫描策略, 使其能够根据实际的内存访问活跃程度进行自适应调整.
+
+具体地,我们通过如下公式来计算扫描间隔 T_interval, 下一轮扫描间隔 T_interval 会随扫描时间 Tscan 的变化而变化以适应不同的内存访问模式:
 
 T_interval = (SCAN_K * T_scan + SCAN_K_BASE) * T_scan + SCAN_BASE_INTERVAL
-
-t = (ax+b)x + c
 
 其中:  
 - T_scan 代表本轮扫描所消耗的时间  
 - SCAN_K 和 SCAN_K_BASE 是调节系数,用于控制扫描间隔对扫描时间的敏感度  
-- SCAN_BASE_INTERVAL 是基础扫描间隔,保证低负载情况下仍然能进行周期性扫描  
+- SCAN_BASE_INTERVAL 是基础扫描间隔,保证低负载情况下仍然能进行周期性扫描 
 
-扫描时间 Tscan 越长,下一轮扫描间隔 Tinterval 也相应增长,减少扫描对系统的影响.若扫描时间较短,则缩短扫描间隔,保证高效监控进程的访存行为
+注意到扫描间隔的修正公式选择引入以 T_interval ∝ T_scan² 的非线性策略，这是因为 2.2 节我们通过实验验证发现扫描时间对程序性能的减速并非成线性关系,而是二次方关系. 后台的扫描时间 T_scan 对前台应用性能的影响会随着 T_scan 的增长呈加速式放大, 若采用线性调节策略（例如 T_interval = k × T_scan + b），无法有效抵消 T_scan 带来的非线性性能开销，在高负载场景下系统仍面临显著的性能退化。为此，我们引入以 T_interval ∝ T_scan² 的非线性策略，实现对页表扫描的性能开销的指数级抑制.
 
-我们通过实验验证发现扫描时间对程序性能的减速并非成线性关系,而是二次方关系.后台的扫描时间 T_scan 对前台应用性能的影响会随着 T_scan 的增长成倍提升,因此使用二次方提高扫描间隔缓解由于扫描带来的性能开销.
+该动态调整策略能够自适应系统内存负载,平衡不同规模应用的影响,确保小内存应用不浪费 CPU 资源, 大内存应用不过度占用 CPU 资源. 不论 VM 中工作负载的访问模式如何变化始终可以保持对前台进程的性能影响不超过 5%，实验结果见 [4.3.1]
 
-该动态调整策略能够自适应系统内存负载,平衡不同规模应用的影响,确保小内存应用不过度扫描,大内存应用不过度占用 CPU 资源.
-
-下一轮扫描间隔与本轮扫描间隔有关 T_scan, 可以根据系统负载适应性地延长或缩短扫描间隔,降低对程序性能的影响,同时保持对进程访存行为的有效监控.自适应扫描间隔能够动态适配不同应用的内存访问模式,提高页表扫描的效率,同时降低对前台进程的性能影响.
-
-实验结果见 [4]
-
-#### 3.2.3 optimized page table tree search
+#### 3.2.4 Page Table scan optimization
 
 Linux 采用四级/五级页表结构进行地址翻译,页表访问的层次包括:PGD(Page Global Directory)、PUD(Page Upper Directory)、PMD(Page Middle Directory)和 PTE(Page Table Entry)(部分架构在此基础上增加 P4D 形成五级页表).在内核中,针对进程页面的遍历通常使用 walk_page_vma 进行单个 VMA(虚拟内存区域)的页表遍历,或者使用 walk_page_range 访问整个进程的某一段地址空间.目前,大多数依赖页表扫描的系统(如 AutoNUMA、DAMON)直接使用 walk_page_range 遍历所有 PTE,以检查 A/D 位的设置情况.然而,这种方法存在显著的性能瓶颈,尤其是在 大规模内存环境 和 稀疏页表 场景下.
 
@@ -146,19 +148,39 @@ Linux 采用四级/五级页表结构进行地址翻译,页表访问的层次包
 
 基于这一观察,我们设计并实现了 优化版页表扫描函数 walk_page_vma_opt,通过 逐层检查 ACCESS 位 来 剪枝未被访问的页表节点,减少 PTE 级别的遍历开销.使用 walk_page_range 会访问整个进程的地址空间,而在许多情况下,未被访问的页表区域无需遍历.linux 内核 API 没有采用这个优化是因为 walk_page_range 的设计目的就是遍历进程的所有页表空间并进行对应的处理,这个优化操作是利用处理器硬件特性并专门针对页面A/D位扫描需求实现的. 该patch仅涉及到一个新文件的添加,可以被无缝应用到几乎大部分内核版本中
 
-我们对比了 telescope 
+优化实验结果见 [4.3.2]
 
-Telescope 主要用于优化 DAMON 采样,提高访存监控效率,而 walk_page_vma_opt 具备更广泛的适用性,保持了和原API相同的接口, 能够无缝适配 autonuma、DAMON 等所有依赖 A/D 位扫描的方案;
+### 3.3 MGLRU-Enhanced Page Temperature Classifier
 
-优化实验结果见 [4]
+#### 3.3.1 Enhance Host MGLRU Classifier
 
-### 3.3 MGLRU-based Page Classification
+vtism 对 MGLRU 进行了增强，设计并实现了一套 Guest-Host 协同的页面分类机制，突破了传统 MGLRU 仅依赖 Host 侧访问观测结果的限制。Guest OS 会定期将访问活跃的 GPA 写入共享内存区域, vtism 通过 KVM 模块解析 VM 的 EPT 映射，将 gpa 地址转换为对应的 hva，将 VM 的 gpa 地址转化为 host kernel 可以处理的 hva 地址。随后 Host 内核会将 VM 热点页面的访问信息和正确的页面类型追加至 MGLRU 的多代访问统计框架中，并主动推进 MGLRU 执行新一轮迭代，从而在多代队列结构中及时提升活跃页面至最新一代，避免其被错误回收。
 
-### 3.4 延迟感知的 Multi-thread Asynchronous Page Migration
+此外，vtism 针对当前驻留于远程 NUMA 节点或 CXL 内存节点的活跃页面，能够基于页面热度主动发起页面提升操作，将其迁移至本地 NUMA 节点，以优化内存访问路径
 
-页面迁移的核心任务是在保证系统整体性能的前提下,准确高效地实现内存页面在不同NUMA节点间的迁移.为实现这一目标,VTISM设计了延迟带宽感知的多线程异步迁移框架
+#### 3.3.2 why use MGLRU
 
-#### 3.4.1 延迟感知的迁移决策
+MGLRU（Multi-Generational Least Recently Used）是 Linux 社区提出的一种替代传统 LRU 算法的页面回收机制，其核心思想是通过引入“世代（generation）”的概念，将页面按访问时间划分为多个代队列，从而更加细粒度地描述页面的访问热度。这一机制在 Linux 6.1 内核中被主线采纳，已成为新一代内存回收策略的重要实现。已有大量的性能测试表明 MGLRU 在许多方面都显著优于传统 LRU 机制[引用]
+
+传统 LRU 在匿名页与文件页之间缺乏统一的热度衡量方式，尤其在多 cgroup 场景下易出现冷页滞留或热页误回收等问题。MGLRU 通过统一的多代结构，使不同类型页面在全局范围内可比较，有效提升回收决策的准确性
+
+此外，MGLRU 引入基于 refault 事件的自校正机制，当被回收页面短时间内重新被访问，系统会调整回收权重。配合 PID 控制器动态调节各代页面的回收频率，使得回收策略更加鲁棒，适应性更强。
+
+### 3.4 NUMA-Aware Asynchronous Page Migration
+
+<!-- 页面迁移的性能高度依赖于 NUMA 拓扑结构及其访问延迟特征。为了在保持 NUMA 亲和性的前提下最大化迁移效率，vtism 设计了一个 NUMA 感知的异步页面迁移器，结合工作队列机制、页面迁移流程异步解耦和实时延迟感知优化，实现对页面提升与降级操作的高效调度 -->
+
+vtism 基于 Linux 内核的工作队列机制实现了异步页面迁移。每个 NUMA 节点上分别维护一对页面提升队列（promote_wq）与降级队列（demote_wq），用于处理跨节点的热页上迁与冷页下迁任务。迁移任务以工作项形式异步提交，由绑定目标节点 CPU 的内核线程在后台执行。该设计具有三点优势：
+
+- 迁移队列本地化，减少跨节点同步与调度开销；
+- 任务类型分离，将提升队列和降级队列分离，避免多节点竞争锁导致性能退化；
+- 优先级差异化处理：页面提升任务具有实时性要求，为保障关键数据的低延迟访问，promote_wq 被配置为 WQ_HIGHPRI 高优先级队列，使得热页迁移可以优先完成。而页面降级操作本质为后台内存整理任务，对实时性要求较低，demote_wq 可延迟调度，由内核在对应 NUMA 节点 CPU 空闲时执行，以减小系统扰动。
+
+在页面提升时，迁移任务会被提交到目标 NUMA 节点（即目标页所在节点）的 promote_wq，以便目标节点线程完成执行迁移任务后提前预取迁移目标页面的内容，降低迁移完成后的首次访问延迟，减少 TLB miss
+
+在页面降级时，迁移任务则被提交至源 NUMA 节点的 demote_wq。这是因为源节点线程更接近原始页所在内存及其访问上下文，能够更高效地完成页面复制和页表更新。
+<!-- 
+#### 3.4.2 延迟感知的动态调度优化
 
 在异构内存架构中,传统的分层内存管理系统通常基于静态的性能假设进行设计,即简单地认为DRAM节点的访问性能在所有场景下都优于CXL内存节点.然而,这种假设忽略了现代计算系统中内存访问行为的动态特性,特别是在高并发、多租户的虚拟化环境中.VTISM通过深入分析内存子系统的实际运行特征,提出了更精细化的迁移决策机制.
 
@@ -201,7 +223,7 @@ Linux 的页面迁移有同步迁移和异步迁移两种模式,同步迁移先�
 
 减少锁争用:使用 RCU 避免页表锁,避免高并发时 mmap_lock 带来的性能瓶颈;冷页迁移可以使用 trylock,减少锁等待对应用程序的影响
 
-预取优化:页面提升前,可以先检查目标地址是否存在 TLB entry,如果不存在,提前 prefetch 目标页面(prefetchw(new_page);)可以迁移后新页面的 TLB miss,提升访问速度.
+
 
 活跃进程对其活跃页面的访问是影响系统性能的关键因素.如果这些活跃页面位于慢速内存节点(如 CXL-DRAM 或 NVM),我们希望尽快将其迁移到高速内存节点(如 DRAM),以降低访问延迟.然而,页面迁移的前提是目标节点具备足够的可用内存,否则迁移操作将会失败,从而影响性能优化的效果.因此,在执行页面迁移时,确保目标节点的可用内存充足是至关重要的.
 
@@ -219,7 +241,7 @@ Linux 的页面迁移有同步迁移和异步迁移两种模式,同步迁移先�
 
 每个节点一个 promote_wq demote_wq, wq numa node CPU 亲和性
 
-<!-- https://docs.kernel.org/core-api/workqueue.html -->
+https://docs.kernel.org/core-api/workqueue.html
 
 promote_wq[dst_node]: 页面提升时,任务提交到 dst 所在 NUMA 节点的 promote_wq
 
@@ -227,103 +249,101 @@ demote_wq[src_node]: 页面降级时,任务提交到 dst 所在 NUMA 节点的 d
 
 需要一个理由
 
-nomad 只使用一个工作队列 [code](https://github.com/lingfenghsiang/Nomad/blob/602da42dcd6b6cf86ecfa50ba1ab7ab3b6dceb9f/src/nomad_module/async_promote_main.c#L1080)
+nomad 只使用一个工作队列 [code](https://github.com/lingfenghsiang/Nomad/blob/602da42dcd6b6cf86ecfa50ba1ab7ab3b6dceb9f/src/nomad_module/async_promote_main.c#L1080) -->
 
 ## 4 evaluation and analysis
 
 ### 4.1 Experimental Setup
 
-| **Component**       | **Specification** |
-| ------------------- | --- |
+我们在一台双路服务器上构建了具有异构分层内存结构的实验平台，用于系统性评估 vtism 的性能表现。该平台配备了两颗 Intel Xeon Platinum 8468V 处理器，提供总计 96 个物理核心，Hyper-Threading 被关闭以消除 SMT 干扰。每个处理器连接一个 DDR5 内存节点（NUMA Node 0 和 Node 1），同时系统还集成了两个基于 Compute Express Link（CXL）的远程内存节点（NUMA Node 2 和 Node 3），使用 Hynix CXL-DRAM 模组，每个容量为 64GB，从而构建了典型的 DRAM-CXL 分层内存架构。CXL 设备连接在 Node1 上，与 node1 的 numa 拓扑比 node0 更近。
+
+测试平台的详细硬件与软件配置如表所示[link]。所有实验均在运行 Linux 内核版本 v6.6 的 Ubuntu 22.04 LTS 上进行，确保内核对 MGLRU、CXL 以及虚拟化子系统的最新支持。虚拟机通过 QEMU 8.2.2 启动，分配 16 个 vCPU 和 32GB 内存，启用 KVM 虚拟化加速与 VT-x 指令集扩展。
+
+在性能评估中，我们将 vtism 与当前主流的分层内存管理方案进行对比，包括 AutoNUMA、tpp、nomad
+
+| **Component**       | **Specification**                                                                                                                 |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
 | **CPU**             | 2× Intel® Xeon® Platinum 8468V CPUs @3.8 GHz, 48 cores per socket, 192 total CPUs, Hyper-Threading disabled                       |
 | **Memory**          | **NUMA Node 0 & 1:** DDR5-4800, 32GB per channel, Hynix DIMM modules <br> **NUMA Node 2 & 3:** CXL-DRAM, 64GB, Hynix DIMM modules |
 | **NUMA Nodes**      | Node 0: CPU 0-47, 32GB DDR5-4800 <br> Node 1: CPU 48-95, 32GB DDR5-4800 <br> Node 2: CXL-DRAM, 64GB <br> Node 3: CXL-DRAM, 64GB   |
 | **Virtualization**  | QEMU emulator version 8.2.2, 32GB VM, 16 CPU cores, KVM enabled, VT-x support                                                     |
-| **System Software** | Ubuntu 22.04 LTS                 |
+| **System Software** | Ubuntu 22.04 LTS                                                                                                                  |
 
-- autonuma 
-- tpp
-- nomad
 
-Hemem PEBS 虚拟化不合适
+为全面覆盖不同负载类型，我们选取了六个广泛使用的 benchmark 工作负载，涵盖键值存储、图处理、机器学习、高性能计算及随机访问行为等多个类别，
+
+- Redis (YCSB)：采用 Yahoo Cloud Serving Benchmark（YCSB）对 Redis 进行测试，模拟典型的云服务键值存储访问模式，反映高吞吐量、小数据对象的读写负载特征。
+- PageRank (gabps)：基于 GAP Benchmark Suite 实现的 PageRank 算法，代表典型的迭代式图处理工作负载，具有频繁的稀疏数据访问和邻接访问模式。
+- Graph500：国际图处理性能评估标准，用于测试大规模图遍历与搜索算法的内存子系统性能，强调带宽敏感性和不规则访问。
+- Liblinear (HIGGS)：使用 HIGGS 数据集在 Liblinear 上进行训练，反映机器学习模型在训练过程中对大量特征数据的密集内存访问行为。
+- XSBench：一个用于核物理模拟的内存密集型基准程序，具有高并发、以缓存为主的查询特征，代表高性能计算场景中对随机小对象的频繁访问。
+- GUPS：Giga Updates Per Second，用于衡量系统在随机内存访问场景下的更新能力，是测试系统内存访问延迟和带宽的经典负载。
+
+所属类别和 RSS 占用见表格
 
 | **Benchmark**   | **Category**                      | **RSS** |
 | --------------- | --------------------------------- | ------- |
 | Redis (YCSB)    | Key-Value Store                   | 29 GB   |
 | PageRank(gabps) | Graph Processing                  | 21 GB   |
 | Graph500        | Graph Processing                  | 15 GB   |
+| Liblinear(HIGGS)       | Machine learning                  | 10 GB   |
 | XSBench         | High-Performance Computing        | 14 GB   |
-| Btree           | Measures index lookup performance | 16 GB   |
-| GUPS            | Random Memory Access Patterns     | 16 GB   |
+| GUPS            | Random Memory Access Patterns     | 8 GB    |
 
 ### 4.2 Experimental Approach
 
+我们在 4.3 评估了页面跟踪的开销以及优化页表扫描带来的性能提升，在 4.4 
+
 ### 4.3 page tracking
 
-#### 4.3.2 static scan interval impact for vm
+#### 4.3.1 argument and overhead
 
+自适应间隔的页表扫描策略需要确定三个参数，调节系数 SCAN_K 和 SCAN_K_BASE, 分别控制扫描时间 T_scan 的二次项和一次项权重，决定扫描间隔对扫描成本的敏感度;SCAN_BASE_INTERVAL 是基础扫描间隔，用于保障在低负载或低页表扫描时系统仍可定期识别热页。
 
-#### 4.3.3 overhead
-
-一张图,证明二次函数有效性
-
-
-
-考虑到上述影响,如果采用线性调整策略 T_interval = SCAN_K * T_scan + SCAN_BASE_INTERVAL 那么当 T_scan 增长时,扫描间隔的调整幅度不足,无法有效缓解大规模页表扫描对应用程序的影响.
-
-overhead 测试了 500 1000 2000 4000
-
-T_interval = (SCAN_K * T_scan + SCAN_K_BASE) * T_scan + SCAN_BASE_INTERVAL
-
-x = delte-x
-
-t = (ax+b)x + c
-
-1000 1500 2000 2500 1GB active workload 下,确定 2500 作为 BASE interval time
+我们首先通过在 1GB 活跃负载下使用固定扫描间隔（1000ms、1500ms、2000ms、2500ms）进行评估。结果显示 2500ms 在性能开销和热页识别率之间取得了良好平衡，因而被选定为 SCAN_BASE_INTERVAL。
 
 ![](./result/track/base_interval/base_scan_interval.png)
 
-越高的活跃工作负载对应的扫描间隔时间越长,同时可以保证 overhead 始终在 5% 以下.这种自适应的调节方式可以适应不同强度的工作负载,对于更大容量的 VM 以及工作负载也可以很好平衡 overhead 和 Performance
+在确定基础间隔之后，我们进一步探索了调节系数 SCAN_K 对动态负载适应性的影响。此时将 SCAN_K_BASE 设置为 0，仅评估 SCAN_K 二次项的影响. 实验结果如图，当 SCAN_K 设置为 7 时，在大部分负载下系统开销超出控制阈值（5%）；当 SCAN_K 为 8 时仅有极少数情况超出阈值，而 SCAN_K = 9 时在所有测试中均满足约束。考虑到我们希望在尽可能较高的扫描频率下保证系统开销控制在 5% 以下，最终选择 SCAN_K = 8，随后，我们将 SCAN_K_BASE 设置为 50，进一步提升扫描间隔在不同 T_scan 情况下的调整弹性。实验表明，在该配置下所有测试负载场景中系统开销均保持在安全范围之内
 
 ![](./result/track/adaptive_scan/adaptive_overhead_bar.png)
 
-![](./result/track/adaptive_scan/adaptive_scan_line.png)
+在该配置下，我们对多个 benchmark 工作负载进行评估，结果显示系统性能开销均低于 5%，验证了参数配置的有效性与通用性
 
-其中:  
-- T_scan 代表本轮扫描所消耗的时间  
-- SCAN_K 和 SCAN_K_BASE 是调节系数,用于控制扫描间隔对扫描时间的敏感度  
-- SCAN_BASE_INTERVAL 是基础扫描间隔,保证低负载情况下仍然能进行周期性扫描  
+![](./result/track/overhead/benchmark_overhead.png)
 
-- SCAN_K = 10
-- SCAN_K_BASE = 50
-- SCAN_BASE_INTERVAL = 2000
+我们也设计实验评估了线性调整策略，即 T_interval = SCAN_K * T_scan + SCAN_BASE_INTERVAL，依然选定 2500 作为 SCAN_BASE_INTERVAL。尽管随着系数SCAN_K 的增加，程序因页表扫描带来的性能开销（overhead）有所下降，但在高活跃工作负载条件下，该开销依然呈现持续上升趋势，未能有效遏制页面扫描对进程性能的负面影响。在大规模工作负载场景下，页表扫描时长增长幅度显著，而线性间隔调整的响应速度与幅度均不足，导致扫描频率仍然偏高，从而加剧对前台应用的干扰
 
-2000+ 
+![](./result/track/linear_not_good/linear_scan_k.png)
 
-![](./result/track/overhead/overhead.png)
+#### 4.3.2 page table scan optimization
 
+我们在多个 benchmark 上对比评估了默认页表扫描模式（walk_page）与优化页表扫描模式（walk_page_opt）的性能差异。
+
+下图展示了 redis 场景下的对比结果：两种扫描方式最终识别出的活跃页表项数量一致，但 walk_page_opt 通过跳过未访问路径，大幅减少了约 10% 的扫描范围，有效降低了扫描成本。
 
 ![](./result/track/pt_scan/pt_scan_redis_bar.png)
 
-redis xsbench pr 都是访存比较密集的应用, graph500 的提升特别明显, 因为 Graph500 主要用于评测大规模图处理的性能,它的核心算法是 BFS(Breadth-First Search,广度优先搜索),Graph500 需要遍历大型图的数据结构(通常是邻接表或压缩格式存储),访问模式呈非连续、非局部特性, 这导致其访存模式是高度稀疏的
+进一步，我们在六个典型 benchmark 上进行了系统评估。实验结果如图所示，在所有 benchmark 上均减小了 PTE 扫描范围和扫描时间, redis、xsbench、pr 和 gups 均为访问频繁、局部性较强的内存密集型应用，在这类场景中优化效果相对有限。而 graph500 和 liblinear 的性能提升最为显著：因为 Graph500 主要用于评测大规模图处理的性能,它的核心算法是 BFS(Breadth-First Search,广度优先搜索),Graph500 需要遍历大型图的数据结构(通常是邻接表或压缩格式存储),访问模式呈非连续、非局部特性, 这导致其访存模式是高度稀疏的。liblinear 则涉及大量稀疏数据的加载和处理，其训练过程中的内存访问分布同样稀疏，优化扫描策略可以显著减少冗余页表项的遍历开销。
 
-opt 的扫描模式会去除掉根节点的访问,大幅缩小扫描范围
+walk_page_opt 能够通过剪枝未访问的上层页表路径，在不牺牲热页识别准确性的前提下，显著缩小扫描范围、降低扫描开销。优化效果随着应用访问稀疏性增强而越发明显，验证了该方法对图计算、稀疏矩阵计算等典型场景的适用性和通用价值。
 
 ![](./result/track/pt_scan/pt_scan_opt_all.png)
 
-### page migration
+### 4.4 page migration
 
-CPU 绑定到 node0, 初始在 node2 上分配 2GB 内存,读写比例 7:3,不断随机访存 10000 次记录当前页面在 NUMA 节点上的分布情况
+我们在系统平台上评估了多种分层内存方案在页面迁移速度方面的性能表现。实验设置如下：将 CPU 绑定至本地 NUMA 节点（node0），并在两个远程 CXL 节点（node2 和 node3）上各分配 2GB 内存。随后持续对分配区域执行写操作以触发页面访问，每隔 1 秒统计一次页面在各 NUMA 节点上的分布情况，Y 轴表示当前在 node0 上成功迁移的页面总大小。
 
-对比页面提升速度:页面提升由 numa_hint_fault 驱动,所有分层内存管理算法都在同一时间触发并开始进行 node2->node0 的页面提升, vtism 的页面提升速度是最快的
-
-每个有 CPU 的顶层内存节点设置 4 个迁移线程,并且设置一对 wait_queue
+随着访存行为的发生，CXL 内存上的访问触发 numa_hint_fault，导致页面开始被迁移至本地节点。所有分层内存管理策略在同一时间启动页面提升操作，即 node2→node0 与 node3→node0 的页面迁移流程。其中，vtism 显著优于其他方案，表现出最快的页面迁移速度。进一步分析发现，autonuma 和 tpp 均采用了 Linux 默认的同步迁移机制，迁移速度相对稳定但较慢；nomad 与 vtism 都基于工作队列机制实现异步页面迁移
 
 ![](./result/migration/promote/promote.png)
 
-for 循环遍历一次所有内存,开一个线程每隔1s获取一次page的位置,画一个t的,看谁先迁移完成
+下图展示了在两个远程节点同时迁移 2/3 内存至本地节点的实验结果。可以看到，vtism 的迁移速度高于 nomad，因为两者存在关键实现差异：nomad 仅使用一个全局迁移工作队列处理所有节点的迁移任务，缺乏并行性支持，在多个 NUMA 节点同时发起大量迁移请求时容易成为性能瓶颈。
+相比之下，vtism 为每个 NUMA 节点分别设置了独立的 promote（提升）队列，并将工作队列线程绑定到对应节点的本地 CPU 上，同时使用 WQ_HIGHPRI 设置高优先级以确保关键热页能被优先迁移，从而显著提升了迁移效率。
 
-```bash
+![](./result/migration/double_promote/promote_compare.png)
+
+<!-- ```bash
 numactl --cpubind=0 --membind=2 ./mm-mem/bin/cpu_loaded_latency
 ```
 
@@ -331,7 +351,19 @@ numactl --cpubind=0 --membind=2 ./mm-mem/bin/cpu_loaded_latency
 cat /proc/vmstat | grep numa
 taskset -cp $(pidof cpu_loaded_latency)
 numastat -p $(pidof cpu_loaded_latency)
-```
+``` -->
 
-## conclusion and future work
+### 4.5 page classification
 
+[TODO] 修改后的 MGLRU 的页面类型识别是准确的
+
+MGLRU - MGLRU-Enhanced
+
+![](./result/benchmark/benchmark_compare.png)
+
+## 5. Related Work
+
+Telescope 采用了相似的优化思路，但其修改 [https://lkml.org/lkml/2024/3/18/547] 仅作用在 DAMON 中, 也无法兼容各种版本的虚拟机内核，walk_page_vma_opt 具备更广泛的适用性,保持了和原API相同的接口, 能够在各个版本内核上无缝适配所有依赖 A/D 位扫描的方案;
+
+
+## 6. conclusion and future work

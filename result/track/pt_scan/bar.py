@@ -42,18 +42,20 @@ def main():
 
     fig, ax = plt.subplots(figsize=(8, 6))
     #ffc000 #0070c0
+    # color_ptes = '#bfbfef'
+    # color_time = '#3f3fcf'
     bars1 = ax.bar(
-        x - width / 2, original_values, width, label="Accessed PTEs", color="#ffbfbf", linewidth=1, edgecolor="black"
+        x - width / 2, original_values, width, label="Accessed PTEs", color="#bfbfef", linewidth=1, edgecolor="black"
     )
     bars2 = ax.bar(
-        x + width / 2, optimized_values, width, label="Total Scan PTEs", color="#ff3f3f", linewidth=1, edgecolor="black"
+        x + width / 2, optimized_values, width, label="Total Scan PTEs", color="#3f3fcf", linewidth=1, edgecolor="black"
     )
     ax.tick_params(direction='in')
 
     # 添加标签和标题
     # ax.set_xlabel("Metrics", fontsize=18)
     plt.yticks(fontsize=12)
-    ax.set_ylabel("PTE count(k)", fontsize=16)
+    ax.set_ylabel("Average PTE count(k)", fontsize=16)
     # ax.set_title("Comparison of Original and Optimized")
     ax.set_xticks(x)
     ax.set_xticklabels(categories, fontsize=16)
@@ -71,7 +73,7 @@ def main():
 
     # 调整布局并保存
     plt.tight_layout()
-    plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
+    # plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
     plt.savefig(f"pt_scan_{name}_bar.png", dpi=300)
     plt.show()
 

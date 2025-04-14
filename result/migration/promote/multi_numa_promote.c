@@ -12,24 +12,23 @@
 #include <unistd.h>
 
 #define SIZE_GB    2
-#define SIZE_MB    ((SIZE_GB * 1024ul))  // Allocate 2048MB (2GB) memory
-#define PAGE_SIZE  4096                 // Page size: 4KB
-#define ACCESS_CNT 10000                // Number of memory accesses per iteration
-#define ITER_CNT   100
+#define SIZE_MB    ((SIZE_GB * 1024ul))
+#define PAGE_SIZE  4096
+#define ACCESS_CNT 10000
+#define ITER_CNT   500
 
 int r_ratio;
 pthread_t monitor_thread;
 
-// Global variables for NUMA status tracking
 int *status = NULL;
 void **pages = NULL;
 int num_nodes;
 unsigned int *node_counts;
 int total_pages;
-int cpu_node;
+int cpu_node = 0;
+void *mem_1, *mem_2;
 bool stop = false;
 
-// Function to bind CPU to NUMA node
 void bind_cpu_to_node(int cpu_node) {
     cpu_set_t mask;
     CPU_ZERO(&mask);
@@ -63,7 +62,6 @@ void bind_cpu_to_node(int cpu_node) {
     printf("CPU bound to NUMA node %d (CPU %d)\n", cpu_node, first_cpu);
 }
 
-// Function to allocate memory on a specific NUMA node
 void *allocate_memory_node(int mem_node, size_t size) {
     void *mem = malloc(size);
     memset(mem, 0, size);
@@ -71,7 +69,6 @@ void *allocate_memory_node(int mem_node, size_t size) {
     long page_size = sysconf(_SC_PAGESIZE);
     long num_pages = size / page_size;
 
-    // Allocate memory for page addresses
     void **pages = malloc(num_pages * sizeof(void *));
     if (!pages) {
         perror("malloc failed");
@@ -82,7 +79,6 @@ void *allocate_memory_node(int mem_node, size_t size) {
         pages[i] = (char *)mem + i * page_size;
     }
 
-    // Set target NUMA node
     int *nodes = malloc(num_pages * sizeof(int));
     if (!nodes) {
         perror("malloc failed");
@@ -94,7 +90,6 @@ void *allocate_memory_node(int mem_node, size_t size) {
         nodes[i] = mem_node;
     }
 
-    // Move pages to the specified NUMA node
     int *status = malloc(num_pages * sizeof(int));
     int ret = move_pages(0, num_pages, pages, nodes, status, MPOL_MF_MOVE);
     if (ret != 0) {
@@ -105,34 +100,33 @@ void *allocate_memory_node(int mem_node, size_t size) {
 
     free(pages);
     free(nodes);
+    free(status);
     return mem;
 }
 
-// Initialize NUMA status
-void init_numa_status(void *mem, size_t size) {
+void init_numa_status() {
     num_nodes = numa_max_node() + 1;
-    total_pages = size / PAGE_SIZE;
+    total_pages = SIZE_MB * 1024 / 4;
 
-    status = (int *)calloc(total_pages, sizeof(int));
+    status = (int *)calloc(total_pages * 2, sizeof(int));
     node_counts = (unsigned int *)calloc(num_nodes, sizeof(int));
-    pages = (void **)malloc(total_pages * sizeof(void *));
+    pages = (void **)malloc(total_pages * 2 * sizeof(void *));
     for (int k = 0; k < total_pages; k++) {
-        pages[k] = (char *)mem + k * PAGE_SIZE;
+        pages[k] = (char *)mem_1 + k * PAGE_SIZE;
+        pages[total_pages + k] = (char *)mem_2 + k * PAGE_SIZE;
     }
 }
 
-// Function to show NUMA memory information
-void show_mem_numa_info(void *mem, size_t size) {
+void show_mem_numa_info() {
     printf("[NUMA Page Distribution]\n");
     memset(node_counts, 0, sizeof(int) * num_nodes);
-    memset(status, 0, total_pages * sizeof(int));
+    memset(status, 0, total_pages * 2 * sizeof(int));
     int err = 0;
-    if (move_pages(0, total_pages, pages, NULL, status, 0) == 0) {
-        for (int k = 0; k < total_pages; k++) {
+    if (move_pages(0, total_pages * 2, pages, NULL, status, 0) == 0) {
+        for (int k = 0; k < total_pages * 2; k++) {
             if (status[k] >= 0) {
                 node_counts[status[k]]++;
             } else {
-                // fprintf(stderr, "Error retrieving NUMA status\n");
                 err += 1;
             }
         }
@@ -140,7 +134,7 @@ void show_mem_numa_info(void *mem, size_t size) {
             printf("NUMA Node %d: %d pages (%.2f MB)\n", n, node_counts[n], node_counts[n] * 4 / 1024.0);
         }
         printf("err = %d\n", err);
-        if (node_counts[cpu_node] == total_pages) {
+        if (node_counts[cpu_node] == total_pages * 2) {
             stop = true;
         }
     } else {
@@ -148,77 +142,72 @@ void show_mem_numa_info(void *mem, size_t size) {
     }
 }
 
-void touch_memory(void *mem, size_t size) {
-    volatile char *arr = (volatile char *)mem;
-    size_t num_pages = size / PAGE_SIZE;  // 计算总页数
-    size_t step = PAGE_SIZE;              // **步长默认 4KB，可改大**
+void touch_memory_dual(void *mem1, void *mem2, size_t size) {
+    volatile char *arr1 = (volatile char *)mem1;
+    volatile char *arr2 = (volatile char *)mem2;
+    size_t num_pages = size / PAGE_SIZE;
+    size_t step = PAGE_SIZE;
 
-    printf("Starting sequential memory access to observe NUMA migration\n");
+    printf("Starting memory access on both memory regions\n");
     for (int count = 1; count <= ITER_CNT && !stop; count++) {
         for (size_t i = 0; i < num_pages && !stop; i += (step / PAGE_SIZE)) {
             bool r = (rand() % 100) < r_ratio;
             if (r) {
-                volatile int x = arr[i * PAGE_SIZE];  // **逐页访问**
+                volatile int x1 = arr1[i * PAGE_SIZE];
+                volatile int x2 = arr2[i * PAGE_SIZE];
             } else {
-                arr[i * PAGE_SIZE] += 1;  // **逐页访问**
+                arr1[i * PAGE_SIZE] += 1;
+                arr2[i * PAGE_SIZE] += 1;
             }
-            // usleep(1);
-
-            // if (count % 10 == 0) {  // 每 10 轮显示 NUMA 迁移状态
-            //     printf("\nIteration %d/%d completed\n", count / 10, ITER_CNT / 10);
-            //     show_mem_numa_info(mem, size);
-            // }
+            usleep(1);
         }
-        usleep(1000);  // 休眠 10ms，减少 CPU 负载
+        usleep(1000);
     }
-    printf("finished touch memory\n");
+    printf("Finished dual memory access\n");
 }
 
-// Thread function to monitor page location every second
 void *monitor_page_location(void *arg) {
     while (1) {
         if (stop) {
             break;
         }
         sleep(1);
-        show_mem_numa_info(arg, SIZE_MB * 1024 * 1024);  // Periodically check page locations
+        show_mem_numa_info();
     }
     printf("finished thread monitoring\n");
     return NULL;
 }
 
 int main(int argc, char *argv[]) {
-    // if (argc != 4) {
-    //     fprintf(stderr, "Usage: %s <CPU_NODE> <MEM_NODE> <R_RATIO>\n", argv[0]);
-    //     exit(1);
-    // }
+    if (argc != 5) {
+        fprintf(stderr, "Usage: %s <CPU_NODE> <MEM_NODE_1> <MEM_NODE_2> <R_RATIO>\n", argv[0]);
+        exit(1);
+    }
 
-    // cpu_node = atoi(argv[1]);
-    // int mem_node = atoi(argv[2]);
-    // r_ratio = atoi(argv[3]);
-    cpu_node = 0;
-    int mem_node_1 = 2;
-    int mem_node_2 = 3;
+    cpu_node = atoi(argv[1]);
+    int mem_node_1 = atoi(argv[2]);
+    int mem_node_2 = atoi(argv[3]);
+    r_ratio = atoi(argv[4]);
+
     size_t size = SIZE_MB * 1024 * 1024;
 
     bind_cpu_to_node(cpu_node);
-    void *mem = allocate_memory_node(mem_node_1, size);
-    if (!mem) {
-        printf("mmap failed\n");
+
+    mem_1 = allocate_memory_node(mem_node_1, size);
+    mem_2 = allocate_memory_node(mem_node_2, size);
+    if (!mem_1 || !mem_2) {
+        printf("memory allocation failed\n");
         return 0;
     }
-    init_numa_status(mem, size);
-    show_mem_numa_info(mem, size);
 
-    // Start the page location monitoring thread
-    pthread_create(&monitor_thread, NULL, monitor_page_location, mem);
+    init_numa_status();
 
-    // Perform memory access in the main thread
-    touch_memory(mem, size);
+    pthread_create(&monitor_thread, NULL, monitor_page_location, NULL);
+    touch_memory_dual(mem_1, mem_2, size);
+    pthread_join(monitor_thread, NULL);
 
-    pthread_join(monitor_thread, NULL);  // Wait for monitor thread to finish
-
-    free(mem);
+    free(mem_1);
+    free(mem_2);
     printf("Memory successfully freed\n");
 
     return 0;

@@ -56,13 +56,13 @@ def plot_speedups(benchmarks, ptes_speedups, time_speedups):
     
     fig, ax = plt.subplots(figsize=figsize)
 
-    bars1 = ax.bar(x - bar_width / 2, ptes_speedups, bar_width, label='PTEs Speedup',
+    bars1 = ax.bar(x - bar_width / 2, ptes_speedups, bar_width, label='PTEs Area Reduction',
                    color=color_ptes, linewidth=0.5, edgecolor="black")
-    bars2 = ax.bar(x + bar_width / 2, time_speedups, bar_width, label='Time Speedup',
+    bars2 = ax.bar(x + bar_width / 2, time_speedups, bar_width, label='Scan Time Reduction',
                    color=color_time, linewidth=0.5, edgecolor="black")
 
     ax.tick_params(direction='in')
-    ax.set_ylabel('Speedup(%)', fontsize=label_fontsize)
+    ax.set_ylabel('Reduction (%)', fontsize=label_fontsize)
     ax.set_xticks(x)
     ax.set_xticklabels(benchmarks, fontsize=tick_fontsize)
     plt.yticks(fontsize=tick_fontsize)

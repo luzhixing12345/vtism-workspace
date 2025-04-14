@@ -8,7 +8,7 @@ def get_data(file_path):
         content = f.read()
         
     # 正则表达式匹配 A/T 的值
-    pattern = re.compile(r'Page walk result: A/T: (\d+)/(\d+) \((\d+) microseconds\)')
+    pattern = re.compile(r'pt_scan: A/T: (\d+)/(\d+) \((\d+) ms\)')
     matches = re.findall(pattern, content)
     
     # 将匹配到的 A 和 T 分别提取出来
@@ -21,7 +21,8 @@ def get_data(file_path):
 
 def main():
 
-    name = "liblinear"
+    import sys
+    name = sys.argv[1]
     basic_name = name + ".log"
     opt_name = name + "_opt.log"
 
@@ -65,8 +66,8 @@ def main():
     
     # 显示图例
     plt.legend()
-    plt.savefig(f'pt_scan_{name}.pdf', dpi=300)
-    print(f"generate {f'pt_scan_{name}.pdf'}")
+    plt.savefig(f'pt_scan_{name}.png', dpi=300)
+    print(f"generate {f'pt_scan_{name}.png'}")
     # plt.savefig('pt_scan.pdf', dpi=300, pad_inches=0.0, bbox_inches="tight")
     
 

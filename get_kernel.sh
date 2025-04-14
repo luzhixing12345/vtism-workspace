@@ -14,8 +14,8 @@ case "$1" in
     memtis)
         echo "/home/lzx/memtis/linux/arch/x86/boot/bzImage"
         ;;
-    base)
-        echo "/home/lzx/code/linux-6.6/arch/x86/boot/bzImage"
+    autonuma)
+        echo "/home/lzx/code/linux-5.13.1/arch/x86/boot/bzImage"
         ;;
     *)
         echo "Error: Unknown kernel variant '$1'" >&2

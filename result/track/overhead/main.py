@@ -61,7 +61,7 @@ ax.bar(benchmarks, overheads, color=bar_color, edgecolor='black', width=bar_widt
 ax.set_ylabel("Overhead (%)", fontsize=font_size_label)
 ax.set_ylim(0, 8)
 ax.set_yticks([0, 2, 4, 5, 6, 8])
-ax.axhline(y=5, color='black', linestyle='--', linewidth=2)
+ax.axhline(y=5, color='grey', linestyle='--', linewidth=2)
 
 ax.set_xticks(range(len(benchmarks)))
 ax.set_xticklabels(benchmarks, fontsize=font_size_ticks)
