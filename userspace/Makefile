@@ -1,19 +1,23 @@
-
-
+# 编译器和参数
 CC = gcc
+# CFLAGS = -O3 -Wall
+LDFLAGS = -lnuma -lpthread
 
-TARGET = mem_stress mem_access_1s
+# 所有的 .c 文件
+SRCS := $(wildcard *.c)
 
-all: $(TARGET)
+# 对应的可执行文件（去掉.c后缀）
+TARGETS := $(SRCS:.c=)
 
-%.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+# 默认目标：编译所有
+all: $(TARGETS)
 
-mem_stress: mem_stress.c
-	$(CC) $^ $(LDFLAGS) -lnuma -o $@
+# 每个目标的编译规则
+%: %.c
+	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)
 
-mem_access_1s: mem_access_1s.c
-	$(CC) $^ $(LDFLAGS) -o $@
-
+# 清理
 clean:
-	rm -f *.o $(TARGET)
+	rm -f $(TARGETS)
+
+.PHONY: all clean
