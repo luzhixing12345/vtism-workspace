@@ -36,7 +36,7 @@ setup_tpp() {
     # https://docs.kernel.org/admin-guide/sysctl/kernel.html#numa-balancing
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
-    echo 1000 >/proc/sys/vm/demote_scale_factor
+    echo 500 >/proc/sys/vm/demote_scale_factor
 }
 
 setup_nomad() {
@@ -45,7 +45,7 @@ setup_nomad() {
     echo 1 >/sys/kernel/mm/numa/demotion_enabled
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
-    echo 1000 >/proc/sys/vm/demote_scale_factor
+    echo 500 >/proc/sys/vm/demote_scale_factor
 }
 
 setup_autonuma() {
@@ -73,7 +73,7 @@ setup_vtism() {
     echo 1 >/sys/kernel/mm/numa/demotion_enabled
     echo 2 >/proc/sys/kernel/numa_balancing
     swapoff -a
-    echo 1000 > /proc/sys/vm/watermark_scale_factor
+    echo 500 > /proc/sys/vm/watermark_scale_factor
 }
 
 system_init() {
@@ -81,10 +81,12 @@ system_init() {
     # turn off hyperthreading and tune CPU to best performance
     echo "use performance governor"
     echo "performance" | sudo tee /sys/devices/system/cpu/cpu*/cpufreq/scaling_governor > /dev/null
+    ulimit -l unlimited
     # echo "turn off hyperthreading"
     # echo off | sudo tee /sys/devices/system/cpu/smt/control > /dev/null
 
     choose_kernel_setup
+    sudo dmesg -C
 }
 
 run_mem_stress() {

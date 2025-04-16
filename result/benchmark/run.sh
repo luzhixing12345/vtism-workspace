@@ -4,13 +4,19 @@
 
 echo "finish warmup"
 
+export KERNEL_VERSION=$1
+
+if [[ "$KERNEL_VERSION" == "vtism" ]]; then
+    sudo insmod pt_scan.ko
+    echo "insmod pt_scan"
+fi
+
 cd workspace
 
 benchmarks=("redis" "pr" "graph500" "liblinear" "xsbench" "gups")
 
 for benchmark in "${benchmarks[@]}"; do
     echo "Running $benchmark benchmark"
-
     case $benchmark in
         redis)
             ./scripts/run/redis.sh
@@ -39,3 +45,7 @@ for benchmark in "${benchmarks[@]}"; do
     esac
 
 done
+
+if [[ "$KERNEL_VERSION" == "vtism" ]]; then
+    sudo rmmod pt_scan
+fi

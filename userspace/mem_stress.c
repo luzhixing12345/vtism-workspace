@@ -5,6 +5,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <unistd.h>
+#include <sys/mman.h>   // mlock
+#include <string.h>     // memset
 
 #define GB           (1024L * 1024 * 1024)
 #define PAGE_SIZE    (4L * 1024)  // 4KB Page
@@ -17,7 +19,7 @@ void pin_to_numa_node(int node) {
         exit(EXIT_FAILURE);
     }
 
-    // 绑定 CPU 到 node1
+    // 绑定 CPU 到 node
     struct bitmask *cpumask = numa_allocate_cpumask();
     numa_node_to_cpus(node, cpumask);
     if (numa_sched_setaffinity(0, cpumask) < 0) {
@@ -26,7 +28,7 @@ void pin_to_numa_node(int node) {
     }
     numa_free_cpumask(cpumask);
 
-    // 绑定内存到 node1
+    // 绑定内存到 node
     struct bitmask *memmask = numa_allocate_nodemask();
     numa_bitmask_setbit(memmask, node);
     numa_set_membind(memmask);
@@ -40,6 +42,7 @@ int main(int argc, char **argv) {
     }
     int node = atoi(argv[1]);
     int size = atoi(argv[2]);
+
     printf("Binding to NUMA node %d...\n", node);
     pin_to_numa_node(node);
 
@@ -48,6 +51,12 @@ int main(int argc, char **argv) {
     char *buffer = (char *)numa_alloc_onnode(memory_size, node);
     if (!buffer) {
         perror("Memory allocation failed");
+        return EXIT_FAILURE;
+    }
+
+    // 🔒 锁定分配的内存，防止页面被迁移
+    if (mlock(buffer, memory_size) != 0) {
+        perror("mlock failed");
         return EXIT_FAILURE;
     }
 
@@ -62,12 +71,13 @@ int main(int argc, char **argv) {
     while (1) {
         for (long i = 0; i < NUM_ACCESSES; i++) {
             long index = (rand() % (memory_size / PAGE_SIZE)) * PAGE_SIZE;
-            buffer[index]++;  // 读写操作
+            buffer[index]++;
         }
-        printf("Sleeping for %d seconds...\n", SLEEP_TIME);
-        sleep(SLEEP_TIME);
+        // sleep(SLEEP_TIME);
     }
 
+    // 不太可能执行到这里，但还是加上
+    munlock(buffer, memory_size);
     numa_free(buffer, memory_size);
     return 0;
 }

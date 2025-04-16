@@ -12,6 +12,8 @@ TARGETS := $(SRCS:.c=)
 # 默认目标：编译所有
 all: $(TARGETS)
 
+CFLAGS=-O0
+
 # 每个目标的编译规则
 %: %.c
 	$(CC) $(CFLAGS) $< -o $@ $(LDFLAGS)

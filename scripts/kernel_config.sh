@@ -1,4 +1,4 @@
-KERNEL_VERSION="tpp"
+# KERNEL_VERSION="tpp"
 # KERNEL_VERSION="nomad"
 # KERNEL_VERSION="memtis"
 # KERNEL_VERSION="autonuma"
