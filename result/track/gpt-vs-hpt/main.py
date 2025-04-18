@@ -2,10 +2,9 @@ import re
 import matplotlib.pyplot as plt
 
 # 可调整的字体大小
-axis_font_size = 16
-tick_font_size = 16
-legend_font_size = 14
-
+axis_font_size = 22
+tick_font_size = 22
+legend_font_size = 18
 def get_data(file_path):
     with open(file_path, "r") as f:
         content = f.read()
@@ -26,8 +25,8 @@ def main():
     
     plt.figure(figsize=(10, 6))
     # 绘制曲线
-    plt.plot(ept_scan, label="HPT scan", color="blue")
-    plt.plot(gpt_scan, label="GPT scan", color="red")
+    plt.plot(ept_scan, label="HPT scan", color="blue", linewidth=2)
+    plt.plot(gpt_scan, label="GPT scan", color="red", linewidth=2)
 
     # 添加标题和标签
     plt.xlabel("Time (minutes)", fontsize=axis_font_size)

@@ -7,7 +7,7 @@ import numpy as np
 font_size = 16
 axis_font_size = 18
 names = ['vtism', 'nomad']
-colors = ['#3333cb', '#8dc2e9']  # vtism 蓝色，nomad 淡蓝
+colors = ['#3333cb', '#E64B35']  # vtism 蓝色，nomad 淡蓝
 
 # 解析日志，返回 MB 单位
 def parse_log_file(file_path, target_node):
@@ -69,7 +69,6 @@ def plot_combined_data():
             marker=marker,
             markersize=6,
             markerfacecolor=colors[group_idx],
-            markeredgecolor='black',
             markevery=3,
             linewidth=2
         )

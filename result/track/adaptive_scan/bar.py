@@ -44,9 +44,9 @@ x_labels = [str(i) for i in even_indices]
 fig, ax1 = plt.subplots(figsize=figsize)
 for idx, overhead in enumerate(all_overhead):
     bar_pos = [i + (idx - 1.5) * bar_width for i in x]
-    label = f'SCAN_K = {intervals[idx]}, SCAN_K_BASE = 0'
+    label = r'$K_{scan}$ = ' + f"{intervals[idx]}," + r' $K_{base}$ = 0'
     if idx == 2:
-        label = f'SCAN_K = 8, SCAN_K_BASE = 50'
+        label = r'$K_{scan}$ = 8, $K_{base}$ = 50'
     ax1.bar(bar_pos, overhead, width=bar_width,
             label=label, color=bar_colors[idx], edgecolor='black')
 

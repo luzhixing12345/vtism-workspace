@@ -3,12 +3,12 @@ import matplotlib.pyplot as plt
 
 # ========== 可调参数 ==========
 log_file = "base_interval.log"  # 日志文件路径
-bar_color = "blue"  # 柱子颜色
+bar_color = "#3f3fcf"  # 柱子颜色
 bar_edge = "black"  # 柱子边缘颜色
-font_size = 14  # 字体大小
-ylabel_fontsize = 16  # y 轴标签字体大小
-xlabel_fontsize = 16  # x 轴标签字体大小
-title_fontsize = 18  # 标题字体大小
+font_size = 20  # 字体大小
+ylabel_fontsize = 20  # y 轴标签字体大小
+xlabel_fontsize = 20  # x 轴标签字体大小
+# title_fontsize = 18  # 标题字体大小
 # ==============================
 
 with open(log_file, 'r') as f:

@@ -2,7 +2,14 @@ import json
 import matplotlib.pyplot as plt
 import numpy as np
 
-# 加载 JSON 数据
+# ======== 字体和线宽参数提取 ========
+axis_font_size = 22
+tick_font_size = 20
+legend_font_size = 16
+marker_font_size = 6
+linewidth = 3
+
+# ======== 加载 JSON 数据 ========
 with open("data.json", "r") as f:
     data = json.load(f)
 
@@ -18,51 +25,38 @@ for i in range(len(host_anon_pages_list)):
     guest_anon_pages_list[i] = guest_anon_pages_list[i] / 1024 / 1024
     guest_file_pages_list[i] = guest_file_pages_list[i] / 1024 / 1024
 
-# 创建 X 轴 (数据点的索引)
 x = list(range(len(host_anon_pages_list)))
 
 # 创建一个函数来选择均匀分布的标记点
 def get_marker_positions(data, num_points=10):
-    # 计算均匀分布的位置
     return np.linspace(0, len(data)-1, num_points, dtype=int)
-
-# 获取每条线的标记位置
-host_anon_markers = get_marker_positions(host_anon_pages_list)
-host_file_markers = get_marker_positions(host_file_pages_list)
-guest_anon_markers = get_marker_positions(guest_anon_pages_list)
-guest_file_markers = get_marker_positions(guest_file_pages_list)
 
 # 创建图形
 plt.figure(figsize=(10, 6))
-linewidth = 2.5
 
-# 绘制宿主机数据并在每条线上均匀添加标记
-# 绘制宿主机数据并在每条线上均匀添加标记
-plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#ff0000", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
-plt.plot(x, host_file_pages_list, label="Host VM File", color="#ff0000", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_anon_pages_list, label="Guest VM Anon", color="#0000ff", linewidth=linewidth, marker='o', markersize=5, markevery=len(x)//10)
-plt.plot(x, guest_file_pages_list, label="Guest VM File", color="#0000ff", linewidth=linewidth, marker='s', markersize=5, markevery=len(x)//10)
+# 绘图（使用统一样式）
+plt.plot(x, host_anon_pages_list, label="Host VM Anon", color="#ff0000", linewidth=linewidth,
+         marker='o', markersize=marker_font_size, markevery=len(x)//10)
 
+plt.plot(x, host_file_pages_list, label="Host VM File", color="#ff0000", linewidth=linewidth,
+         marker='s', markersize=marker_font_size, markevery=len(x)//10)
 
-# 添加标题和标签
-plt.xlabel("Time (minutes)", fontsize=20)
-plt.ylabel("Page Cache(GB)", fontsize=20)
-plt.xticks([])  # 去掉 x 轴刻度
-plt.tick_params(axis="both", direction="in", length=6)
-plt.legend(fontsize=15)
+plt.plot(x, guest_anon_pages_list, label="Guest VM Anon", color="#0000ff", linewidth=linewidth,
+         marker='o', markersize=marker_font_size, markevery=len(x)//10)
 
-# 设置字体大小
-plt.xticks(fontsize=18)
-plt.yticks(fontsize=18)
+plt.plot(x, guest_file_pages_list, label="Guest VM File", color="#0000ff", linewidth=linewidth,
+         marker='s', markersize=marker_font_size, markevery=len(x)//10)
+
+# 标签、图例、刻度等字体大小
+plt.xlabel("Time (minutes)", fontsize=axis_font_size)
+plt.ylabel("Page Cache (GB)", fontsize=axis_font_size)
+plt.xticks([])  # 隐藏 x 轴刻度值
+plt.tick_params(axis="both", direction="in", length=6, labelsize=tick_font_size)
+plt.legend(fontsize=legend_font_size)
 
 # 显示网格
 plt.grid(True, linestyle="-", alpha=0.7)
 
-# 调整图像布局
+# 布局 & 保存
 plt.tight_layout()
-
-# 保存图像到文件
 plt.savefig("anon_pages_comparison.png", dpi=300)
-
-# 显示图形
-# plt.show()

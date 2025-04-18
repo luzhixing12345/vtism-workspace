@@ -3,9 +3,8 @@ import matplotlib.pyplot as plt
 from collections import defaultdict
 
 # 字体和样式参数
-title_fontsize = 16
-axis_fontsize = 16
-tick_font_size = 14
+axis_fontsize = 20
+tick_font_size = 20
 line_width = 2
 marker_size = 6
 line_color = "blue"
@@ -36,29 +35,18 @@ def plot_avg_scan_time(avg_times):
 
     plt.xlabel("Active Workload Memory Size (GB)", fontsize=axis_fontsize)
     plt.ylabel("Average Scan Time (ms)", fontsize=axis_fontsize)
-    # plt.title("Average Scan Time vs Memory Size", fontsize=title_fontsize)
-    plt.xticks(memory_sizes, fontsize=tick_font_size)
-    extra_yticks = []
-    # for x in [1, 2,3]:
-    #     if x in avg_times:
-    #         y = avg_times[x]
-    #         extra_yticks.append(y)
-            # # 标注虚线
-            # ax.axhline(y=y, linestyle='--', color=dashed_line_color, linewidth=1)
-            # ax.text(memory_sizes[0] - 0.5, y + 0.3, f"{y:.1f} ms", color=dashed_line_color, fontsize=10)
 
-    # 更新 y 轴刻度
-    # current_yticks = list(ax.get_yticks())
-    # new_yticks = sorted(set(current_yticks[1:-1] + extra_yticks))
-    # ax.set_yticks(new_yticks)
-
+    # 只保留偶数横坐标
+    even_memory_sizes = [size for size in memory_sizes if size % 2 == 0]
+    plt.xticks(even_memory_sizes, fontsize=tick_font_size)
+    
     plt.yticks(fontsize=tick_font_size)
     plt.grid(True, linestyle='--', alpha=0.5)
-    # plt.legend(fontsize=16)
     plt.tight_layout()
     plt.tick_params(axis="both", direction="in", length=6)
     plt.savefig("scan_time.png", dpi=300)
-    plt.show()
+    # plt.show()
+
 
 if __name__ == "__main__":
     log_file = "scan_time.log"

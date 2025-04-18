@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import re
 
 # 样式配置
-bar_color = "blue"
+bar_color = "#3f3fcf"
 bar_width = 0.4
 figsize = (10, 6)
 dpi = 300

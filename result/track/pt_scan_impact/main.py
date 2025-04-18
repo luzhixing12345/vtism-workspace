@@ -1,5 +1,10 @@
 import matplotlib.pyplot as plt
 
+# 字体大小参数
+axis_font_size = 18
+tick_font_size = 18
+legend_font_size = 13.5
+
 # 定义文件名和对应的标签
 log_files = {
     "0.log": "baseline",
@@ -11,9 +16,8 @@ log_files = {
 
 # 颜色和样式
 colors = ["#a90226", "#3851a3", "#72aacc", "#fdba6c", "#eb5d3b"]
-# line_styles = ["-", "--", "-.", ":", "-"]
 
-plt.figure(figsize=(12, 6))
+plt.figure(figsize=(10, 6))
 
 # 读取并绘制每个日志文件
 for i, (file, label) in enumerate(log_files.items()):
@@ -32,21 +36,20 @@ for i, (file, label) in enumerate(log_files.items()):
     plt.plot(iterations, accesses, label=label, color=colors[i], marker="o")
 
 # 设置标题和坐标轴
-plt.xlabel("Time(secs)", fontsize=14)
-plt.ylabel("Max Memory Accesses (1s)", fontsize=14)
-# plt.title("Memory Accesses Over Time with Different Scan Intervals", fontsize=16)
+plt.xlabel("Time(secs)", fontsize=axis_font_size)
+plt.ylabel("Max Memory Accesses (1s)", fontsize=axis_font_size)
+plt.xticks(fontsize=tick_font_size)
+plt.yticks(fontsize=tick_font_size)
 
-# 添加图例
-# plt.legend(title="Scan Interval", fontsize=12)
+# 图例
 plt.legend(
-    fontsize=12, loc="upper center",
+    fontsize=legend_font_size, loc="upper center",
     bbox_to_anchor=(0.5, 1.15), ncol=5
 )
 
-# 显示网格
+# 网格、布局、保存
 plt.grid(True, linestyle="--", alpha=0.6)
-
-# 保存和显示
+plt.gca().yaxis.offsetText.set_fontsize(tick_font_size-4)
 plt.tight_layout()
 plt.savefig("memory_accesses.png", dpi=300)
 # plt.show()

@@ -7,10 +7,10 @@ font_size = 18
 axis_font_size = 18
 colors = ["#3851a3", "#72aacc", "#fdba6c", "#eb5d3b"]
 labels = [
-    'autonuma + sync migration',
-    'autonuma + fix threshold + sync migration',
-    'autonuma + adaptive scan + sync migration',
-    'autonuma + adaptive scan + async migration'
+    'autonuma + host scan + sync migration',
+    'autonuma + guest scan(fix threshold) + sync migration',
+    'autonuma + guest scan(adaptive) + sync migration',
+    'autonuma + guest scan(adaptive) + async migration'
 ]
 benchmarks = ['graph500','pr']
 

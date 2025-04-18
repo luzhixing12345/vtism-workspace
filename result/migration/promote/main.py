@@ -7,8 +7,8 @@ import numpy as np
 font_size = 16
 axis_font_size = 18
 title_font_size = 20
-names = ['autonuma', 'nomad', 'vtism', 'tpp']
-colors = ['#d6a36f', '#8dc2e9', '#3333cb', '#E64B35']
+names = ['autonuma', 'nomad', 'tpp','vtism']
+colors = ['#d6a36f', '#E64B35', '#8dc2e9', '#3333cb']
 
 # 解析日志，返回 MB 单位
 def parse_log_file(file_path):
@@ -41,18 +41,18 @@ def plot_combined_data(log_files):
 
     plt.figure(figsize=(10, 6))
 
+    markers = ['o', 's', '^', 'D']  # 添加不同的 marker 样式
+
     for i, node0_data in enumerate(aligned_data):
-        # 转为 GB 单位
         node0_data_gb = [mb / 1024 for mb in node0_data]
         plt.plot(
             iterations,
             node0_data_gb,
             color=colors[i],
             label=names[i],
-            marker='o',
+            marker=markers[i],  # 使用不同 marker
             markersize=6,
             markerfacecolor=colors[i],
-            markeredgecolor='black',
             markevery=3,
             linewidth=2
         )
@@ -69,7 +69,7 @@ def plot_combined_data(log_files):
 # 主程序
 import sys
 def main():
-    r = sys.argv[1]
+    r = 0
     log_files = [f'{name}.{r}.log' for name in names]
     plot_combined_data(log_files)
 

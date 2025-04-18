@@ -23,13 +23,13 @@ with open(log_file, 'r') as file:
             times.append(time_value/1000)  # 转换为毫秒
 
 # 统一字体大小变量
-FONT_SIZE = 16
-LEGEND_SIZE = 14
-LABEL_SIZE = 18
-TICK_SIZE = 14
+FONT_SIZE = 20
+LEGEND_SIZE = 20
+LABEL_SIZE = 20
+TICK_SIZE = 20
 
 # 调整图形尺寸
-fig, ax1 = plt.subplots(figsize=(10, 5))
+fig, ax1 = plt.subplots(figsize=(10, 6))
 
 # 绘制页表值的折线
 ax1.set_xlabel('Time(minutes)', fontsize=LABEL_SIZE)
@@ -49,6 +49,8 @@ fig.legend(loc='upper right', bbox_to_anchor=(0.90, 0.92), ncol=1, fontsize=LEGE
 # 隐藏 x 轴刻度
 plt.xticks([], fontsize=TICK_SIZE)
 # 调整图形布局
+# plt.gca().yaxis.offsetText.set_fontsize(TICK_SIZE-2)
+
 plt.tight_layout()
 plt.tick_params(axis="both", direction="in", length=6)
 
