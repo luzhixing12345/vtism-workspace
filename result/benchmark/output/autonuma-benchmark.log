@@ -1,0 +1,18 @@
+[benchmark]
+cmd: ycsb load redis -s -P /home/kamilu/workspace/benchmark/workloada.large -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000
+time: 458.11
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 604.77
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 275.27
+[benchmark]
+cmd:train -s 6 -m 16 -e 0.000001 /home/kamilu/workspace/benchmark/liblinear-multicore-2.47/HIGGS
+time: 1999.68
+[benchmark]
+cmd: XSBench -p 8000000 -g 30000
+time: 219.67
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/gups_bench/gups 31 3000000 1024
+time: 305.42

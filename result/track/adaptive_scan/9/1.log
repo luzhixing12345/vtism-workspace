@@ -1,0 +1,21 @@
+Allocating 1 GB memory (262144 pages)...
+Memory allocated. Starting sequential traversal...
+Sequential traversal completed in 10.51 seconds.
+Allocating 1 GB memory (262144 pages)...
+Memory allocated. Starting sequential traversal...
+Sequential traversal completed in 10.58 seconds.
+[   17.304173] pt_scan: loading out-of-tree module taints kernel.
+[   17.304178] pt_scan: module verification failed: signature and/or required key missing - tainting kernel
+[   17.304568] ivshmem_demo_driver 0000:00:0b.0: ivshmem_dev probe ....
+[   17.304570] ivshmem_dev probe ....
+[   17.304594] res->start = 0x380000000000
+[   17.304595] shared memory size = 0x04000000(64MB)
+[   17.304607] read str:\x07
+[   17.304624] ivshmem_demo_driver 0000:00:0b.0:  ivshmem_dev_probe success
+[   17.304651] pt_scan: register pci driver
+[   17.304699] pt_scan: Page walk thread created.
+[   17.305182] pt_scan: A/T: 5041/5108 (0 ms) [2500] [0 GB]
+[   19.810696] pt_scan: A/T: 262613/265901 (5 ms) [2725] [1 GB]
+[   22.309428] pt_scan: A/T: 261948/262378 (4 ms) [2644] [1 GB]
+[   25.034330] pt_scan: A/T: 262160/264519 (4 ms) [2644] [1 GB]
+[   27.678338] pt_scan: A/T: 261898/262213 (4 ms) [2644] [1 GB]

@@ -1,7 +1,5 @@
 
-*
-!.gitignore
-!*.c
-!Makefile
-!*.py
-!*.sh
+
+*.png
+*.o
+mem_access

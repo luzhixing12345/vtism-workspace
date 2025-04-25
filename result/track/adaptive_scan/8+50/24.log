@@ -1,0 +1,22 @@
+Allocating 24 GB memory (6291456 pages)...
+Memory allocated. Starting sequential traversal...
+Sequential traversal completed in 207.86 seconds.
+Allocating 24 GB memory (6291456 pages)...
+Memory allocated. Starting sequential traversal...
+Sequential traversal completed in 209.58 seconds.
+[ 4909.193742] ivshmem_demo_driver 0000:00:0b.0: ivshmem_dev probe ....
+[ 4909.193746] ivshmem_dev probe ....
+[ 4909.193784] res->start = 0x380000000000
+[ 4909.193785] shared memory size = 0x04000000(64MB)
+[ 4909.193797] read str:\x07
+[ 4909.193798] ivshmem_demo_driver 0000:00:0b.0:  ivshmem_dev_probe success
+[ 4909.193826] pt_scan: register pci driver
+[ 4909.193886] pt_scan: Page walk thread created.
+[ 4909.194234] pt_scan: A/T: 235/1547 (0 ms) [2500] [0 GB]
+[ 4911.708769] pt_scan: A/T: 847558/848761 (14 ms) [4768] [3 GB]
+[ 4914.209158] pt_scan: A/T: 879506/880055 (15 ms) [5050] [3 GB]
+[ 4918.990254] pt_scan: A/T: 1680186/1680576 (28 ms) [10172] [6 GB]
+[ 4924.041624] pt_scan: A/T: 1768218/1768796 (29 ms) [10678] [6 GB]
+[ 4934.290972] pt_scan: A/T: 6291493/6291668 (107 ms) [99442] [24 GB]
+[ 4944.967934] pt_scan: A/T: 6291462/6291660 (106 ms) [97688] [24 GB]
+[ 5044.411595] pt_scan: A/T: 6291491/6291735 (107 ms) [99442] [24 GB]

@@ -1,0 +1,30 @@
+Allocating 7 GB memory (1835008 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 21.69 seconds.
+Allocating 7 GB memory (1835008 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 68.96 seconds.
+[  275.756239] pt_scan: A/T: 1834780/1835136 (63 ms) [1000] [7 GB]
+[  276.759241] pt_scan: A/T: 1834778/1835048 (66 ms) [1000] [7 GB]
+[  277.756775] pt_scan: A/T: 1834777/1835043 (64 ms) [1000] [7 GB]
+[  278.759435] pt_scan: A/T: 1834775/1835031 (66 ms) [1000] [7 GB]

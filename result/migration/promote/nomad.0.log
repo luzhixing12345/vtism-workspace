@@ -1,0 +1,286 @@
+CPU bound to NUMA node 0 (CPU 0)
+Successfully migrated 2048 MB memory to NUMA node 2
+Successfully migrated 2048 MB memory to NUMA node 3
+Starting memory access on both memory regions
+[NUMA Page Distribution]
+NUMA Node 0: 17925 pages (70.02 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 506363 pages (1977.98 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 36157 pages (141.24 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 488131 pages (1906.76 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 54301 pages (212.11 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 469987 pages (1835.89 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 72529 pages (283.32 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 451759 pages (1764.68 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 90666 pages (354.16 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 433622 pages (1693.84 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 108845 pages (425.18 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 415443 pages (1622.82 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 127073 pages (496.38 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 397215 pages (1551.62 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 145217 pages (567.25 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 379071 pages (1480.75 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 163480 pages (638.59 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 360808 pages (1409.41 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 181857 pages (710.38 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 342431 pages (1337.62 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 200020 pages (781.33 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 324268 pages (1266.67 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 218248 pages (852.53 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 306040 pages (1195.47 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 236581 pages (924.14 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 524288 pages (2048.00 MB)
+NUMA Node 3: 287707 pages (1123.86 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 266262 pages (1040.09 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 512498 pages (2001.95 MB)
+NUMA Node 3: 269816 pages (1053.97 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 298245 pages (1165.02 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 498319 pages (1946.56 MB)
+NUMA Node 3: 252012 pages (984.42 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 333597 pages (1303.11 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 480641 pages (1877.50 MB)
+NUMA Node 3: 234338 pages (915.38 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 368557 pages (1439.68 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 463199 pages (1809.37 MB)
+NUMA Node 3: 216820 pages (846.95 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 403157 pages (1574.83 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 445910 pages (1741.84 MB)
+NUMA Node 3: 199509 pages (779.33 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 437722 pages (1709.85 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 428582 pages (1674.15 MB)
+NUMA Node 3: 182272 pages (712.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 472172 pages (1844.42 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 411359 pages (1606.87 MB)
+NUMA Node 3: 165045 pages (644.71 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 506376 pages (1978.03 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 394262 pages (1540.09 MB)
+NUMA Node 3: 147938 pages (577.88 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 541373 pages (2114.74 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 376797 pages (1471.86 MB)
+NUMA Node 3: 130406 pages (509.40 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 576783 pages (2253.06 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 359132 pages (1402.86 MB)
+NUMA Node 3: 112661 pages (440.08 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 612224 pages (2391.50 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 341408 pages (1333.62 MB)
+NUMA Node 3: 94944 pages (370.88 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 647588 pages (2529.64 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 323712 pages (1264.50 MB)
+NUMA Node 3: 77276 pages (301.86 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 682833 pages (2667.32 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 306131 pages (1195.82 MB)
+NUMA Node 3: 59612 pages (232.86 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 718290 pages (2805.82 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 288401 pages (1126.57 MB)
+NUMA Node 3: 41885 pages (163.61 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 753715 pages (2944.20 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 270690 pages (1057.38 MB)
+NUMA Node 3: 24171 pages (94.42 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 789037 pages (3082.18 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 253029 pages (988.39 MB)
+NUMA Node 3: 6510 pages (25.43 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 813399 pages (3177.34 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 235177 pages (918.66 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 831453 pages (3247.86 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 217123 pages (848.14 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 849693 pages (3319.11 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 198883 pages (776.89 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 867767 pages (3389.71 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 180809 pages (706.29 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 885834 pages (3460.29 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 162742 pages (635.71 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 903900 pages (3530.86 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 144676 pages (565.14 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 922065 pages (3601.82 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 126511 pages (494.18 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 940286 pages (3672.99 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 108290 pages (423.01 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 958520 pages (3744.22 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 90056 pages (351.78 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 976601 pages (3814.85 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 71975 pages (281.15 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 994633 pages (3885.29 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 53943 pages (210.71 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1012910 pages (3956.68 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 35666 pages (139.32 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1031049 pages (4027.54 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 17527 pages (68.46 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1044934 pages (4081.77 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 3642 pages (14.23 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1048564 pages (4095.95 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 12 pages (0.05 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1048564 pages (4095.95 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 12 pages (0.05 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1048564 pages (4095.95 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 12 pages (0.05 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0
+[NUMA Page Distribution]
+NUMA Node 0: 1048564 pages (4095.95 MB)
+NUMA Node 1: 0 pages (0.00 MB)
+NUMA Node 2: 12 pages (0.05 MB)
+NUMA Node 3: 0 pages (0.00 MB)
+err = 0

@@ -1,7 +1,7 @@
 /disk/tmp/*
 .vscode
 *.png
-output
+/output
 *.zip
 *.tar.gz
 *.tar.xz
@@ -10,9 +10,7 @@ output
 benchmark/ycsb-0.17.0/
 benchmark/spec2017/
 *.model
-*.json
-*.pdf
 *.txt
-*.log
 /gpt-trace/
 pcm/
+benchmark/*/*.pdf

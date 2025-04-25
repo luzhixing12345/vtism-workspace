@@ -1,0 +1,23 @@
+[   32.001684] pt_scan: loading out-of-tree module taints kernel.
+[   32.001688] pt_scan: module verification failed: signature and/or required key missing - tainting kernel
+[   32.002154] ivshmem_demo_driver 0000:00:0b.0: ivshmem_dev probe ....
+[   32.002155] ivshmem_dev probe ....
+[   32.002193] res->start = 0x380000000000
+[   32.002194] shared memory size = 0x04000000(64MB)
+[   32.002208] read str:x\x01
+[   32.002230] ivshmem_demo_driver 0000:00:0b.0:  ivshmem_dev_probe success
+[   32.002265] pt_scan: register pci driver
+[   32.002320] pt_scan: Page walk thread created.
+[   32.002320] pt_scan: SCAN_K = 8
+[   32.004778] pt_scan: A/T: 66304/68592 (2 ms) [2632] [0 GB]
+[   34.504002] pt_scan: A/T: 23983/86739 (1 ms) [2558] [0 GB]
+[   36.294043] hugetlbfs: gups (850): Using mlock ulimits for SHM_HUGETLB is obsolete
+[   37.158566] pt_scan: A/T: 1039657/1118290 (24 ms) [8308] [4 GB]
+[   39.758933] pt_scan: A/T: 3028213/4145218 (66 ms) [40648] [15 GB]
+[   48.080294] pt_scan: A/T: 4204353/4291324 (79 ms) [56378] [16 GB]
+[   88.721020] pt_scan: A/T: 4203879/4283524 (72 ms) [47572] [16 GB]
+[  145.099381] pt_scan: A/T: 4201800/4283581 (73 ms) [48782] [16 GB]
+[  157.900408] tee (883): drop_caches: 3
+[  157.938176] pt_scan: Page walk thread stopped.
+[  157.938178] pt_scan: free pt result
+[  157.938216] ivshmem_demo_driver 0000:00:0b.0: Removed

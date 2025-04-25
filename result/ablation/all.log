@@ -1,0 +1,6 @@
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 211.96
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 338.98

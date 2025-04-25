@@ -1,0 +1,30 @@
+Allocating 2 GB memory (524288 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 6.09 seconds.
+Allocating 2 GB memory (524288 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 7.64 seconds.
+[   19.888780] pt_scan: A/T: 524663/525894 (35 ms) [1000] [2 GB]
+[   20.885098] pt_scan: A/T: 524317/524516 (31 ms) [1000] [2 GB]
+[   21.884985] pt_scan: A/T: 524314/524476 (31 ms) [1000] [2 GB]
+[   22.884895] pt_scan: A/T: 524123/524502 (31 ms) [1000] [2 GB]

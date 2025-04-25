@@ -1,0 +1,30 @@
+Allocating 4 GB memory (1048576 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 12.57 seconds.
+Allocating 4 GB memory (1048576 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 19.96 seconds.
+[   75.909561] pt_scan: A/T: 1048250/1048598 (56 ms) [1000] [4 GB]
+[   76.909605] pt_scan: A/T: 1048291/1048671 (56 ms) [1000] [4 GB]
+[   77.909495] pt_scan: A/T: 1048277/1048648 (55 ms) [1000] [4 GB]
+[   78.894954] pt_scan: A/T: 1048264/1048753 (41 ms) [1000] [4 GB]

@@ -1,0 +1,38 @@
+[    9.603481] pt_scan: loading out-of-tree module taints kernel.
+[    9.603487] pt_scan: module verification failed: signature and/or required key missing - tainting kernel
+[    9.603913] ivshmem_demo_driver 0000:00:0b.0: ivshmem_dev probe ....
+[    9.603915] ivshmem_dev probe ....
+[    9.603959] res->start = 0x380000000000
+[    9.603961] shared memory size = 0x04000000(64MB)
+[    9.603973] read str:\x16
+[    9.603997] ivshmem_demo_driver 0000:00:0b.0:  ivshmem_dev_probe success
+[    9.604028] pt_scan: register pci driver
+[    9.604086] pt_scan: Page walk thread created.
+[    9.604685] pt_scan: A/T: 5173/5238 (0 ms) [2000]
+[   11.607231] pt_scan: A/T: 125449/126755 (3 ms) [2063]
+[   13.610385] pt_scan: A/T: 278093/278250 (6 ms) [2138]
+[   15.670492] pt_scan: A/T: 166416/166640 (3 ms) [2063]
+[   17.823781] pt_scan: A/T: 866135/963757 (18 ms) [2522]
+[   19.883969] pt_scan: A/T: 856789/954711 (15 ms) [2405]
+[   22.410439] pt_scan: A/T: 1050217/1141715 (20 ms) [2600]
+[   24.813675] pt_scan: A/T: 995567/1089060 (18 ms) [2522]
+[   27.463544] pt_scan: A/T: 2933400/3689212 (64 ms) [5328]
+[   29.983130] pt_scan: A/T: 3059245/3689193 (63 ms) [5213]
+[   35.313040] pt_scan: A/T: 3493871/3689260 (65 ms) [5380]
+[   40.529412] pt_scan: A/T: 3485345/3689220 (67 ms) [5551]
+[   45.911254] pt_scan: A/T: 3666344/3858788 (67 ms) [5551]
+[   51.464962] pt_scan: A/T: 3507475/3689200 (67 ms) [5551]
+[   57.014314] pt_scan: A/T: 3507485/3689202 (64 ms) [5328]
+[   62.566654] pt_scan: A/T: 3507580/3689199 (63 ms) [5213]
+[   67.895255] pt_scan: A/T: 3492858/3689200 (64 ms) [5328]
+[   73.107334] pt_scan: A/T: 3486534/3689204 (63 ms) [5213]
+[   78.439819] pt_scan: A/T: 3494176/3689197 (67 ms) [5551]
+[   83.647980] pt_scan: A/T: 3486561/3689200 (63 ms) [5213]
+[   89.200288] pt_scan: A/T: 3509263/3689214 (64 ms) [5328]
+[   94.416209] pt_scan: A/T: 3488075/3689206 (67 ms) [5551]
+[   99.740135] pt_scan: A/T: 3497037/3689223 (63 ms) [5213]
+[  105.295100] pt_scan: A/T: 3509651/3689300 (67 ms) [5551]
+[  107.843755] tee (856): drop_caches: 3
+[  107.881354] pt_scan: Page walk thread stopped.
+[  107.881356] pt_scan: free pt result
+[  107.881394] ivshmem_demo_driver 0000:00:0b.0: Removed

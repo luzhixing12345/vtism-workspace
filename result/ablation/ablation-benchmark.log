@@ -1,0 +1,72 @@
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 212.16
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 221.50
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 226.47
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 217.73
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 222.36
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 225.49
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 216.27
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 235.51
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 213.84
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 393.43
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 249.45
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 400.27
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 240.39
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 343.04
+[benchmark]
+cmd: ycsb load redis -s -P /home/kamilu/workspace/benchmark/workloada.large -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000
+time: 320.98
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 596.15
+[benchmark]
+cmd: mpirun -np 4 /home/kamilu/workspace/benchmark/graph500/src/graph500_reference_bfs 26 20
+time: 272.66
+[benchmark]
+cmd: ycsb load redis -s -P /home/kamilu/workspace/benchmark/workloada.large -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000
+time: 288.99
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 414.49
+[benchmark]
+cmd: ycsb load redis -s -P /home/kamilu/workspace/benchmark/workloada.large -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000
+time: 355.61
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 373.49
+[benchmark]
+cmd: ycsb load redis -s -P /home/kamilu/workspace/benchmark/workloada.large -threads 10 -p redis.host=localhost -p redis.port=6379 -p redis.timeout=3600000
+time: 350.97
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 361.19
+[benchmark]
+cmd: pr -u26 -k20 -i10 -n10
+time: 478.74

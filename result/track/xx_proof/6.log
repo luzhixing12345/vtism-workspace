@@ -1,0 +1,30 @@
+Allocating 6 GB memory (1572864 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 18.88 seconds.
+Allocating 6 GB memory (1572864 pages)...
+Memory allocated. Starting traversal...
+round = 0
+round = 10
+round = 20
+round = 30
+round = 40
+round = 50
+round = 60
+round = 70
+round = 80
+round = 90
+Traversal completed in 44.52 seconds.
+[  184.062425] pt_scan: A/T: 1572572/1572886 (46 ms) [1000] [6 GB]
+[  185.071013] pt_scan: A/T: 1572579/1572886 (54 ms) [1000] [6 GB]
+[  186.060513] pt_scan: A/T: 1572570/1572933 (44 ms) [1000] [6 GB]
+[  187.060673] pt_scan: A/T: 1572586/1572935 (44 ms) [1000] [6 GB]

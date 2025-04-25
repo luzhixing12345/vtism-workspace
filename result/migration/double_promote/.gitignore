@@ -1,7 +1,3 @@
 
-*
-!.gitignore
-!*.c
-!Makefile
-!*.py
-!run.sh
+*.png
+multi_numa_promote
