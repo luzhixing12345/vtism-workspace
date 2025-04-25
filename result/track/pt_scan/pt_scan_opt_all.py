@@ -90,6 +90,7 @@ def main():
     plot_speedups(benchmarks, ptes_speedups, time_speedups)
     plt.tight_layout()
     plt.savefig('pt_scan_opt_all.png', dpi=dpi)
+    plt.savefig('pt_scan_opt_all.pdf', dpi=dpi)
 
 if __name__ == "__main__":
     main()

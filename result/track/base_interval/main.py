@@ -62,6 +62,7 @@ plt.tight_layout()
 
 # 保存图像
 plt.savefig("base_scan_interval.png", dpi=300)
+plt.savefig("base_scan_interval.pdf", dpi=300)
 
 # 显示图像（如果需要，可以取消注释下面一行）
 # plt.show()

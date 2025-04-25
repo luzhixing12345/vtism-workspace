@@ -45,6 +45,7 @@ def main():
     plt.legend(fontsize=14)
     plt.tight_layout()
     plt.savefig("multi_interval_slowdown.png", dpi=300)
+    plt.savefig("multi_interval_slowdown.pdf", dpi=300)
     # plt.show()
 
 if __name__ == "__main__":

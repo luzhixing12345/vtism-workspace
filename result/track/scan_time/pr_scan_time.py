@@ -56,3 +56,4 @@ plt.tick_params(axis="both", direction="in", length=6)
 
 # 保存图像
 plt.savefig('pr_scan_time.png', dpi=300)
+plt.savefig('pr_scan_time.pdf', dpi=300)

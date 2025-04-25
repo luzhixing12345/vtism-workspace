@@ -25,12 +25,12 @@ def main():
     
     plt.figure(figsize=(10, 6))
     # 绘制曲线
-    plt.plot(ept_scan, label="HPT scan", color="blue", linewidth=2)
-    plt.plot(gpt_scan, label="GPT scan", color="red", linewidth=2)
+    plt.plot(ept_scan, label="Host scan range", color="blue", linewidth=2)
+    plt.plot(gpt_scan, label="Guest actual usage", color="red", linewidth=2)
 
     # 添加标题和标签
     plt.xlabel("Time (minutes)", fontsize=axis_font_size)
-    plt.ylabel("scan vm size (GB)", fontsize=axis_font_size)
+    plt.ylabel("Memory size (GB)", fontsize=axis_font_size)
     
     # 调整刻度字体大小
     plt.xticks(fontsize=tick_font_size)
@@ -47,6 +47,7 @@ def main():
 
     # 保存图像
     plt.savefig("gpt-vs-hpt.png", dpi=300)
+    plt.savefig("gpt-vs-hpt.pdf", dpi=300)
 
 if __name__ == "__main__":
     main()

@@ -80,6 +80,7 @@ def plot_combined_data():
     plt.legend(fontsize=font_size, loc='upper left')
     plt.tight_layout()
     plt.savefig('promote_compare.png', dpi=300)
+    plt.savefig('promote_compare.pdf', dpi=300)
     plt.close()
 
 # 主程序

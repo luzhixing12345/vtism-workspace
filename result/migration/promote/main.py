@@ -64,6 +64,7 @@ def plot_combined_data(log_files):
     plt.legend(fontsize=font_size, loc='upper left')
     plt.tight_layout()
     plt.savefig('promote.png', dpi=300)
+    plt.savefig('promote.pdf', dpi=300)
     plt.close()
 
 # 主程序

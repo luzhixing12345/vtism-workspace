@@ -20,7 +20,7 @@ import sys
 
 def main():
     # 读取数据
-    name = sys.argv[1]
+    name = 'redis'
     base_name = name + ".log"
     opt_name = name + "_opt.log"
     A_values, T_values = get_data(base_name)
@@ -40,7 +40,7 @@ def main():
     x = np.arange(len(categories))  # x轴的位置
     width = 0.2  # 减小柱宽以减小组间距离
 
-    fig, ax = plt.subplots(figsize=(8, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     #ffc000 #0070c0
     # color_ptes = '#bfbfef'
     # color_time = '#3f3fcf'
@@ -75,6 +75,7 @@ def main():
     plt.tight_layout()
     # plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
     plt.savefig(f"pt_scan_{name}_bar.png", dpi=300)
+    plt.savefig(f"pt_scan_{name}_bar.pdf", dpi=300)
     plt.show()
 
 

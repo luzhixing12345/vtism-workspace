@@ -97,6 +97,7 @@ def plot_benchmark_bar(data_dict):
     plt.legend(fontsize=legend_font_size)
     plt.tight_layout()
     plt.savefig("benchmark_normalized.png", dpi=300)
+    plt.savefig("benchmark_normalized.pdf", dpi=300)
     plt.close()
 
 

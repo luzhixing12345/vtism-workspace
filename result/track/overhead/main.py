@@ -71,4 +71,5 @@ ax.grid(axis='y', linestyle='--', alpha=0.5)
 
 plt.tight_layout()
 plt.savefig("benchmark_overhead.png", dpi=dpi)
+plt.savefig("benchmark_overhead.pdf", dpi=dpi)
 # plt.show()

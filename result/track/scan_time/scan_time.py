@@ -45,6 +45,7 @@ def plot_avg_scan_time(avg_times):
     plt.tight_layout()
     plt.tick_params(axis="both", direction="in", length=6)
     plt.savefig("scan_time.png", dpi=300)
+    plt.savefig("scan_time.pdf", dpi=300)
     # plt.show()
 
 
