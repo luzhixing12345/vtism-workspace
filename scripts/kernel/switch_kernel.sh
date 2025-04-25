@@ -20,7 +20,6 @@ for kernel in "${kernels[@]}"; do
     kernel_version=$(basename "$kernel" | sed 's/vmlinuz-//')
 
     if [[ "$kernel_version" == "$CURRENT_KERNEL" ]]; then
-        # 白色加粗 + 箭头标识当前内核
         printf "[%d]: \e[1;37m%s ← (current)\e[0m\n" "$count" "$kernel_version"
     else
         echo "[$count]: $kernel_version"

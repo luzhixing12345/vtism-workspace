@@ -25,7 +25,7 @@
 
 #define DEBUG_INFO
 #define SCAN_K             80
-#define SCAN_K_SCALE       10  // 缩放因子
+#define SCAN_K_SCALE       10
 #define SCAN_BASE_INTERVAL 2500
 #define SCAN_K_BASE        50
 
